@@ -45,3 +45,21 @@ def mipView(im):
     mip= np.amax(im,axis=0)
     plt.imshow(mip)
     plt.show()
+
+def img_seg_combine(img,seg):
+# normalize to 0~1
+    img = img.astype(np.float32)
+    img = (img-img.min())/(img.max()-img.min())
+    seg = seg.astype(np.float32)
+    seg[seg>0]=1
+    
+# combine
+    combined = np.concatenate((seg, img), axis=2)
+    
+# overlay
+    ovelay = img.copy()
+    ovelay[seg>0]=1
+    combined = np.concatenate((combined, ovelay), axis=2)
+    
+#     view
+    return combined
