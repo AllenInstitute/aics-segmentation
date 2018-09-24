@@ -45,11 +45,11 @@ setup(name=PACKAGE_NAME,
           'numpy',
           'scipy',
           'pandas',
-          'aicsimage>=0.2.3',
           'tifffile>=0.12.1',
           'scikit-image>=0.13.1',
           'matplotlib>=2.0.0',
           'jupyter',
+          'itkwidgets'
       ],
 
       # For test setup. This will allow JUnit XML output for Jenkins
