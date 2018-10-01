@@ -38,9 +38,9 @@ def intensity_normalization(struct_img, scaling_param):
     print('intensity normalization completes')
     return struct_img
 
-def image_smoothing_gaussian_3d(struct_img, sigma):
+def image_smoothing_gaussian_3d(struct_img, sigma, truncate_range=3.0):
 
-    structure_img_smooth = gaussian_filter(struct_img, sigma=sigma, mode='nearest', truncate=3.0)
+    structure_img_smooth = gaussian_filter(struct_img, sigma=sigma, mode='nearest', truncate=truncate_range)
 
     return structure_img_smooth
 
