@@ -44,10 +44,10 @@ def image_smoothing_gaussian_3d(struct_img, sigma, truncate_range=3.0):
 
     return structure_img_smooth
 
-def image_smoothing_gaussian_slice_by_slice(struct_img, sigma):
+def image_smoothing_gaussian_slice_by_slice(struct_img, sigma, truncate_range=3.0):
 
     structure_img_smooth = np.zeros_like(struct_img)
     for zz in range(struct_img.shape[0]):
-        structure_img_smooth[zz,:,:] = gaussian_filter(struct_img[zz,:,:], sigma=sigma, mode='nearest', truncate=3.0)
+        structure_img_smooth[zz,:,:] = gaussian_filter(struct_img[zz,:,:], sigma=sigma, mode='nearest', truncate=truncate_range)
 
     return structure_img_smooth

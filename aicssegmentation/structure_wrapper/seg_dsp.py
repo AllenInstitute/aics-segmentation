@@ -1,13 +1,12 @@
 import numpy as np
 import os
 from argparse import ArgumentParser
-from aicsimage import processing, io
-from .vessel import vesselness3D, vesselness2D
-from scipy import ndimage as ndi
-from skimage.morphology import remove_small_objects, dilation, erosion, ball, disk, skeletonize, skeletonize_3d
-from .utils import histogram_otsu
-import math
-from .pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from skimage.morphology import remove_small_objects, watershed 
+from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.seg_dot import dot_3d
+from skimage.feature import peak_local_max
+from scipy.ndimage import distance_transform_edt
+from skimage.measure import label
 
 
 def DSP_HiPSC_Pipeline(struct_img,rescale_ratio):
