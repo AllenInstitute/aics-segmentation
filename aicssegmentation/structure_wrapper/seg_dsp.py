@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from argparse import ArgumentParser
-from skimage.morphology import remove_small_objects, watershed 
+from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from ..core.seg_dot import dot_3d
 from skimage.feature import peak_local_max
@@ -48,9 +48,9 @@ def DSP_HiPSC_Pipeline(struct_img,rescale_ratio):
     bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     # step 2: 'local_maxi + watershed' for cell cutting
-    local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=1, indices=False)
+    local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=2, indices=False)
     distance = distance_transform_edt(bw)
-    im_watershed = watershed(-distance, label(local_maxi), mask=bw, watershed_line=True)
+    im_watershed = watershed(-distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
 
     ###################
     # POST-PROCESSING
