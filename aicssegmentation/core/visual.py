@@ -5,6 +5,8 @@ import ipywidgets as widgets
 from ipywidgets import interact, fixed
 from IPython.display import display
 
+from itkwidgets import view 
+
 def sliceViewer(im, zz):
     plt.imshow(im[zz,:,:])
     plt.show()
@@ -12,7 +14,7 @@ def sliceViewer(im, zz):
 def explore_dot_3d(img, sigma, th, roi=[-1]):
     # roi = [x0, y0, x1, y1]
     if roi[0]<0:
-        roi = [0,img.shape[1],0,img.shape[2]]
+        roi = [0,0,img.shape[1],img.shape[2]]
     
     im = img[:,roi[1]:roi[3],roi[0]:roi[2]]
 
@@ -66,13 +68,21 @@ def mipView(im):
     plt.imshow(mip)
     plt.show()
 
-def img_seg_combine(img,seg):
+def img_seg_combine(img,seg, roi=[-1]):
+
+    # roi = [x0, y0, x1, y1]
+    if roi[0]<0:
+        roi = [0,0,img.shape[1],img.shape[2]]
+
     # normalize to 0~1
     img = img.astype(np.float32)
     img = (img-img.min())/(img.max()-img.min())
     seg = seg.astype(np.float32)
     seg[seg>0]=1
     
+    img = img[:,roi[1]:roi[3],roi[0]:roi[2]]
+    seg = seg[:,roi[1]:roi[3],roi[0]:roi[2]]
+
     # combine
     combined = np.concatenate((seg, img), axis=2)
     
@@ -83,3 +93,30 @@ def img_seg_combine(img,seg):
     
     #  view
     return combined
+
+def segmentation_quick_view(seg):
+    valid_pxl = np.unique(seg[seg>0])
+    if len(valid_pxl)<1:
+        print('segmentation is empty')
+        return
+    
+    seg = seg>0
+    seg = seg.astype(np.uint8)
+    seg[seg>0]=255
+
+    return seg
+
+def single_fluorescent_view(im):
+    
+    assert len(im.shape)==3
+
+    im = im.astype(np.float32)
+    im = (im - im.min())/(im.max()-im.min())
+
+    return im 
+
+def seg_fluo_side_by_side(im, seg, roi=[-1]):
+
+    out = img_seg_combine(im,seg, roi)
+    
+    return out 
