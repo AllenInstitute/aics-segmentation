@@ -24,13 +24,21 @@ def readme():
 
 test_deps = ['pytest']
 lint_deps = ['flake8']
-extras = {'test_group': test_deps, 'lint_group': lint_deps}
+jupyter_dev_deps = [
+    'matplotlib>=2.0.0',
+    'jupyter',
+    'itkwidgets'
+]
+extras = {
+    'test_group': test_deps, 
+    'lint_group': lint_deps, 
+    'local_dev_group': jupyter_dev_deps
+}
 
 setup(name=PACKAGE_NAME,
       version=MODULE_VERSION,
       description='Scripts for image features calculation.',
       long_description=readme(),
-      url=GIT_REMOTE_URL,
       author='AICS',
       author_email='jianxuc@alleninstitute.org',
       license='Allen Institute Software License',
@@ -40,15 +48,15 @@ setup(name=PACKAGE_NAME,
       #        "cleanup={}.bin.cleanup_1_collect_str_seg:main".format(PACKAGE_NAME)
       #    ]
       #},
-      keywords=["commit:{}".format(GIT_COMMIT_HASH)],
+      keywords=[
+          "commit:{}".format(GIT_COMMIT_HASH),
+          "aicsgit:{}".format(GIT_REMOTE_URL)
+      ],
       install_requires=[
           'numpy',
           'scipy',
           'pandas',
-          'scikit-image>=0.13.1',
-          'matplotlib>=2.0.0',
-          'jupyter',
-          'itkwidgets'
+          'scikit-image>=0.13.1'
       ],
 
       # For test setup. This will allow JUnit XML output for Jenkins
