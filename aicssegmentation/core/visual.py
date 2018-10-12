@@ -24,9 +24,33 @@ def explore_dot_3d(img, sigma, th, roi=[-1]):
     bw = response > th
 
     out = img_seg_combine(im,bw)
+    return out
 
-    interact(sliceViewer,  im=fixed(out), zz=widgets.IntSlider(min=0,max=out.shape[0]-1,step=1,value=out.shape[0]//2,continuous_update=False));
+def explore_vesselness_3d(im, sigma, th, roi=[-1]):
+    # roi = [x0, y0, x1, y1]
+    if roi[0]<0:
+        roi = [0,0,im.shape[1],im.shape[2]]
 
+    from aicssegmentation.core.vessel import vesselness3D
+
+    response = vesselness3D(im, sigmas=sigma,  tau=1, whiteonblack=True)
+    bw = response > th
+
+    out = img_seg_combine(im,bw, roi)
+    return out
+
+def explore_vesselness_2d(im, sigma, th, roi=[-1]):
+    # roi = [x0, y0, x1, y1]
+    if roi[0]<0:
+        roi = [0,0,im.shape[1],im.shape[2]]
+
+    from aicssegmentation.core.vessel import vesselnessSliceBySlice
+
+    response = vesselnessSliceBySlice(im, sigmas=sigma,  tau=1, whiteonblack=True)
+    bw = response > th
+
+    out = img_seg_combine(im,bw, roi)
+    return out
 
 def blob2dExplorer_single(im, sigma, th):
     #from python_image_analysis.ptDetection import logSlice

@@ -1,5 +1,22 @@
 import numpy as np
+from skimage.morphology import medial_axis
+from scipy.ndimage import distance_transform_edt
+from skimage.morphology import erosion, ball
 
+def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
+
+    safe_zone = np.zeros_like(bw)
+    for zz in range(bw.shape[0]):
+        if np.any(bw[zz,:,:]):
+            ctl = medial_axis(bw[zz,:,:]>0)
+            dist = distance_transform_edt(ctl==0)
+            safe_zone[zz,:,:] = dist > min_thickness +1e-5
+
+    rm_candidate = np.logical_xor(bw>0, erosion(bw>0, ball(thin)))
+
+    bw[np.logical_and(safe_zone, rm_candidate)]=0
+
+    return bw
 
 def divide_nonzero(array1, array2):
     """

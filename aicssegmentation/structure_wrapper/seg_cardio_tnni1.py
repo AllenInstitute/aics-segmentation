@@ -1,22 +1,26 @@
 import numpy as np
 import os
-from skimage.morphology import remove_small_objects
+from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.seg_dot import dot_3d
 from ..core.vessel import vesselness3D
+from skimage.feature import peak_local_max
+from scipy.ndimage import distance_transform_edt
+from skimage.measure import label
 
 
-def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
+def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [3, 15]  #TODO
+    intensity_norm_param = [1, 4]  #TODO
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma = [0.5,2]
-    vesselness_cutoff = 0.15
-    minArea = 10
+    vesselness_sigma = [1,2]
+    vesselness_cutoff = 0.05
+    minArea = 15
     ##########################################################################
 
     ###################
@@ -32,7 +36,7 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing with gaussian filter
-    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+    structure_img_smooth = image_smoothing_gaussian_slice_by_slice(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
     ###################
     # core algorithm

@@ -42,13 +42,20 @@ setup(name=PACKAGE_NAME,
       #},
       keywords=["commit:{}".format(GIT_COMMIT_HASH)],
       install_requires=[
-          'numpy',
-          'scipy',
-          'pandas',
-          'scikit-image>=0.13.1',
+          'numpy==1.15.1',
+          'scipy==1.1.0',
+          'scikit-image==0.14.0',
           'matplotlib>=2.0.0',
           'jupyter',
-          'itkwidgets'
+          'itkwidgets==0.12.2',
+          'pandas==0.23.4',
+          'matplotlib==2.2.3',
+          'aicsimageio==0.4.3',
+          #'tifffile==0.15.1',
+          'setuptools==40.2.0',
+          'numba==0.40.0',
+          'ipython==7.0.1',
+          'ipywidgets==7.4.1'
       ],
 
       # For test setup. This will allow JUnit XML output for Jenkins

@@ -25,19 +25,16 @@ def blobness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblac
 
     return np.max(filtered_array, axis=0)
 
-def vesselness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblack=True):
+def vesselness3D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
     if not nd_array.ndim == 3:
         raise(ValueError("Only 3 dimensions is currently supported"))
 
-    # from https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/_frangi.py#L74
-    sigmas = np.arange(scale_range[0], scale_range[1], scale_step)
+    # adapted from https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/_frangi.py#L74
     if np.any(np.asarray(sigmas) < 0.0):
         raise ValueError("Sigma values less than zero are not valid")
 
-    print(sigmas)
-
-    filtered_array = np.zeros(sigmas.shape + nd_array.shape)
+    filtered_array = np.zeros(tuple([len(sigmas),]) + nd_array.shape)
 
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
@@ -65,19 +62,16 @@ def plateness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, pa=0.5, pb
         
     return np.max(filtered_array, axis=0)
 
-def vesselness2D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblack=True):
+def vesselness2D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
     if not nd_array.ndim == 2:
         raise(ValueError("Only 2 dimensions is currently supported"))
 
-    # from https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/_frangi.py#L74
-    sigmas = np.arange(scale_range[0], scale_range[1], scale_step)
+    # adapted from https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/_frangi.py#L74
     if np.any(np.asarray(sigmas) < 0.0):
         raise ValueError("Sigma values less than zero are not valid")
 
-    print(sigmas)
-
-    filtered_array = np.zeros(sigmas.shape + nd_array.shape)
+    filtered_array = np.zeros(tuple([len(sigmas),]) + nd_array.shape)
 
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
@@ -86,6 +80,17 @@ def vesselness2D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonbl
         filtered_array[i] = compute_vesselness2D(eigenvalues[1], tau = tau)
 
     return np.max(filtered_array, axis=0)
+
+def vesselnessSliceBySlice(nd_array, sigmas, tau=0.5, whiteonblack=True):
+
+    mip= np.amax(nd_array,axis=0)
+    response = np.zeros(nd_array.shape)
+    for zz in range(nd_array.shape[0]):
+        tmp = np.concatenate((nd_array[zz,:,:],mip),axis=1)
+        tmp = vesselness2D(tmp,  sigmas=sigmas, tau=1, whiteonblack=True)
+        response[zz,:,:nd_array.shape[2]-2] = tmp[:,:nd_array.shape[2]-2]
+
+    return response
 
 def compute_blobness3D(eigen1, eigen2, eigen3, tau):
 

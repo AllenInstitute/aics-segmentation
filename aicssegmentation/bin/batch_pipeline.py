@@ -20,15 +20,11 @@ PER_IMAGE = 'per_img'
 PER_DIR = 'per_dir'
 
 STRUCTURE_MAPPING = {
-    'Connexin-43': {'module': 'aicssegmentation.seg_connexin', 'class': 'Connexin_HiPSC_Pipeline'},
-    'Nucleophosmin': {'module': 'aicssegmentation.seg_npm', 'class': 'NPM_HiPSC_Pipeline'},
-    'alpha-actinin-1': {'module': 'aicssegmentation.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},
-    'beta-catenin': {'module': 'aicssegmentation.seg_ctnnb1', 'class': 'BetaCatenin_HiPSC_Pipeline'},
     'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},
-    'atp2a2_cardio': {'module': 'aicssegmentation.structure_wrapper.seg_atp2a2', 'class': 'ATP2A2_Cardio'},
-    'tom20_cardio': {'module': 'aicssegmentation.seg_tomm20', 'class': 'TOMM20_Cardio'},
-    'myosin_cardio': {'module': 'aicssegmentation.seg_myosin', 'class': 'MYH10_Cardio'},
-    'Lamp1': {'module': 'aicssegmentation.seg_lamp1', 'class': 'LAMP1_HiPSC_Pipeline'}
+    'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},
+    'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},
+    'TUBA1B': {'module': 'aicssegmentation.structure_wrapper.seg_tuba1b', 'class': 'TUBA1B_HiPSC_Pipeline'},
+    'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},
 }
 
 
@@ -89,7 +85,7 @@ class Args(object):
     def __parse(self):
         p = argparse.ArgumentParser()
         # Add arguments
-        p.add_argument('-d', '--debug', action='store_true', dest='debug',
+        p.add_argument('--d', '--debug', action='store_true', dest='debug',
                        help='If set debug log output is enabled')
         p.add_argument('--struct_name', required=True, dest='struct_name',
                        help='structure name')
