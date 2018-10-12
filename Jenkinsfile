@@ -23,15 +23,15 @@ node ("python-gradle")
 
         if (!is_promote) {
             stage ("prepare version") {
-                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s prepare"
+//                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s prepare"
             }
 
             stage("build and publish") {
-                sh './gradlew -i cleanAll publish'
+//                sh './gradlew -i cleanAll publish'
             }
 
             stage ("tag and commit") {
-                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s tag"
+//                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s tag"
             }
 
             junit "build/test_report.xml"
