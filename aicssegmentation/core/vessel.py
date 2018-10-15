@@ -88,7 +88,7 @@ def vesselnessSliceBySlice(nd_array, sigmas, tau=0.5, whiteonblack=True):
     for zz in range(nd_array.shape[0]):
         tmp = np.concatenate((nd_array[zz,:,:],mip),axis=1)
         tmp = vesselness2D(tmp,  sigmas=sigmas, tau=1, whiteonblack=True)
-        response[zz,:,:nd_array.shape[2]-2] = tmp[:,:nd_array.shape[2]-2]
+        response[zz,:,:nd_array.shape[2]-3] = tmp[:,:nd_array.shape[2]-3]
 
     return response
 

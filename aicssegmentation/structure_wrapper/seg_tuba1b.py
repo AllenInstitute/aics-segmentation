@@ -16,7 +16,7 @@ def TUBA1B_HiPSC_Pipeline(struct_img,rescale_ratio):
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     vesselness_sigma = [1]
-    vesselness_cutoff = 0.006
+    vesselness_cutoff = 0.01
     minArea = 20
     ##########################################################################
 

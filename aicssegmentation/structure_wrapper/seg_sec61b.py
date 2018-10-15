@@ -15,8 +15,8 @@ def SEC61B_HiPSC_Pipeline(struct_img,rescale_ratio):
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     vesselness_sigma = [1]
-    vesselness_cutoff = 0.1
-    minArea = 10
+    vesselness_cutoff = 0.15
+    minArea = 15
     ##########################################################################
 
     ###################
@@ -45,6 +45,10 @@ def SEC61B_HiPSC_Pipeline(struct_img,rescale_ratio):
     ###################
     # POST-PROCESSING
     ###################
+    bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
+    for zz in range(bw.shape[0]):
+        bw[zz,:,:] = remove_small_objects(bw[zz,:,:], min_size=3, connectivity=1, in_place=False)
+
     seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     # output
