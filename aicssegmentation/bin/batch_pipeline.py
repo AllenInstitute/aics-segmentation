@@ -169,7 +169,7 @@ class Executor(object):
 
             bw = SegModule(struct_img, self.rescale_ratio)
           
-            writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_segmentation.ome.tif')
+            writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_segmentation.tiff')
             writer.save(bw)
 
         elif args.mode == PER_DIR:
@@ -186,7 +186,7 @@ class Executor(object):
 
                 bw = SegModule(struct_img, self.rescale_ratio)
 
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_segmentation.ome.tif')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_segmentation.tiff')
                 writer.save(bw)
 
            
