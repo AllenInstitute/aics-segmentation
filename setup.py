@@ -56,8 +56,6 @@ setup(name=PACKAGE_NAME,
           'pandas>=0.23.4',
           'aicsimageio>=0.4.3',
           'aicsimageprocessing',
-          #'tifffile==0.15.1',
-          'setuptools>=40.2.0',
           'numba>=0.40.0',
       ],
 
