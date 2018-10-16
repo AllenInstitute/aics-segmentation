@@ -21,7 +21,7 @@ source ${venvdir}/bin/activate
 Now install the developer requiremnts
 ```bash
 # Install modules for development
-pip install -e [test_group] -e [lint_group]
+pip install -e .[test_group] -e .[lint_group]
 ```
 
 If you plan to locally test with jupyter notebooks, you can add the `jupyter_group`.
@@ -29,7 +29,7 @@ Replace the above `pip` call with the following.
 
 ```bash
 # Install modules for development, and manual testing in a jupyter environment
-pip install -e [test_group] -e [lint_group] -e [jupyter_group]
+pip install -e .[test_group] -e .[lint_group] -e .[jupyter_group]
 ```
 
 ## Gradle Builds<a name="gradle_builds"></a>
@@ -58,6 +58,6 @@ the `build` task, discussed later, will automatically call one of these tasks.
 
 # Option 3
 # Install everything from option 1, as well as tools for version management and uploads to python artifact repos.
-./gradlew installCIDependecies
+./gradlew installCIDependencies
 # or in short    $> ./gradlew iCID
 ```
