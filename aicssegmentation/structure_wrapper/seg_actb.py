@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_3d
 from ..core.vessel import vesselness3D
 from skimage.feature import peak_local_max
@@ -15,18 +15,20 @@ def ACTB_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1, 4]  #TODO
+    intensity_norm_param = [3, 15] 
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma = [1,2]
-    vesselness_cutoff = 0.1
-    minArea = 15
+    vesselness_sigma_1 = [1]
+    vesselness_cutoff_1 = 0.2
+    vesselness_sigma_2 = [0.25]
+    vesselness_cutoff_2 = 0.075
+    minArea = 5
     ##########################################################################
 
     ###################
     # PRE_PROCESSING
     ###################
-    # intenisty normalization (min/max)
+    # intenisty normalization 
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
     
     # rescale if needed
@@ -36,20 +38,21 @@ def ACTB_HiPSC_Pipeline(struct_img,rescale_ratio):
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing with gaussian filter
-    structure_img_smooth = image_smoothing_gaussian_slice_by_slice(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
     ###################
     # core algorithm
     ###################
 
     # vesselness 3d 
-    response = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
-    bw = response > vesselness_cutoff
+    response_1 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_1,  tau=1, whiteonblack=True)
+    response_2 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_2,  tau=1, whiteonblack=True)
+    bw = np.logical_or(response_1 > vesselness_cutoff_1, response_2 > vesselness_cutoff_2) 
     
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
+    seg = remove_small_objects(bw, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0

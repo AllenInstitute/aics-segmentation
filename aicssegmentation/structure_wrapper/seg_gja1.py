@@ -1,11 +1,8 @@
 import numpy as np
 import os
-from argparse import ArgumentParser
-from aicsimage import processing, io
-from .vessel import vesselness3D, vesselness2D
-from scipy import ndimage as ndi
-from skimage.morphology import remove_small_objects, dilation, erosion, ball, disk, skeletonize, skeletonize_3d
-from .utils import histogram_otsu
+from skimage.morphology import remove_small_objects
+from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.seg_dot import dot_3d, dot_slice_by_slice
 from skimage.measure import label
 import math
 import numba as nb 
@@ -24,11 +21,12 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0]
+    intensity_norm_param = [1, 40]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.012
+    dot_3d_cutoff = 0.025
+    dot_2d_cutoff = 0.0175
     minArea = 4
     ##########################################################################
 
@@ -56,29 +54,26 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio):
     bw = response > dot_3d_cutoff
     bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
+    response2d = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_3d_sigma)
+    bw2d = response2d > dot_2d_cutoff
+
     for zz in range(bw.shape[0]):
         bw_tmp = bw[zz,:,:]
         if np.any(bw_tmp):
             lab_tmp, num_tmp = label(bw_tmp, return_num=True, connectivity=2)
-            out_2ds = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(ndi.gaussian_filter(struct_img[zz,:,:], sigma=1, mode='nearest', truncate=3.0) , log_sigma)
-            bw_2ds = out_2ds>0.01
-            ids = lab_tmp[bw_2ds]
+            ids = lab_tmp[bw2d[zz,:,:]]
             
             s1 = np.unique(ids)
             s2 = np.arange(1,num_tmp+1)
             s0 = np.setdiff1d(s2,s1)
             replace_where(lab_tmp, s0, 0)
             
-            bw_basic[zz,:,:] = lab_tmp>0
-    ## step 2: 'local_maxi + watershed' for cell cutting
-    #local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=2, indices=False)
-    #distance = distance_transform_edt(bw)
-    #im_watershed = watershed(-distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
-
+            bw[zz,:,:] = lab_tmp>0
+    
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(im_watershed, min_size=minArea, connectivity=1, in_place=False)
+    seg = remove_small_objects(bw, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0

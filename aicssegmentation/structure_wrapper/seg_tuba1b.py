@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from ..core.vessel  import vesselness3D
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
+from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
 
 
@@ -33,7 +33,7 @@ def TUBA1B_HiPSC_Pipeline(struct_img,rescale_ratio):
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing with gaussian filter
-    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+    structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)
 
     ###################
     # core algorithm

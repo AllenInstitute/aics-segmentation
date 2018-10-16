@@ -15,11 +15,11 @@ def TJP1_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1, 4]  #TODO
+    intensity_norm_param = [3, 17]  #TODO
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma = [2,3,4]
-    vesselness_cutoff = 0.15
+    vesselness_sigma = [1.5]
+    vesselness_cutoff = 0.2
     minArea = 15
     ##########################################################################
 

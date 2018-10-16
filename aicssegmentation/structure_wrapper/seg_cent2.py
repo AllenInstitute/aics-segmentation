@@ -17,9 +17,9 @@ def CENT2_HiPSC_Pipeline(struct_img,rescale_ratio):
     intensity_norm_param = [0]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    dot_3d_sigma = 0.5
-    dot_3d_cutoff = 0.1
-    minArea = 4
+    dot_3d_sigma = 1
+    dot_3d_cutoff = 0.04
+    minArea = 3
     ##########################################################################
 
     ###################

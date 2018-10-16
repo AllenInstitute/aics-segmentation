@@ -51,6 +51,23 @@ def image_smoothing_gaussian_slice_by_slice(struct_img, sigma, truncate_range=3.
 
     return structure_img_smooth
 
+def boundary_preserving_smoothing_3d(struct_img, numberOfIterations = 5, conductance = 1.2, timeStep = 0.0625):
+    import itk
+
+    itk_img = itk.GetImageFromArray(struct_img.astype(np.float32))
+
+    gradientAnisotropicDiffusionFilter = itk.GradientAnisotropicDiffusionImageFilter.New(itk_img)
+    gradientAnisotropicDiffusionFilter.SetNumberOfIterations(numberOfIterations)
+    gradientAnisotropicDiffusionFilter.SetTimeStep(timeStep)
+    gradientAnisotropicDiffusionFilter.SetConductanceParameter(conductance)
+    gradientAnisotropicDiffusionFilter.Update()
+
+    itk_img_smooth = gradientAnisotropicDiffusionFilter.GetOutput()
+
+    img_smooth_ag = itk.GetArrayFromImage(itk_img_smooth)
+
+    return img_smooth_ag
+
 def suggest_normalization_param(structure_img0):
     m, s = norm.fit(structure_img0.flat)
     print(m)
