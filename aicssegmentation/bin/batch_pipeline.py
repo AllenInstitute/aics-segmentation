@@ -7,6 +7,7 @@ import logging
 import argparse
 import traceback
 import importlib
+import pathlib
 
 from argparse import ArgumentParser
 import aicsimageio
@@ -167,6 +168,8 @@ class Executor(object):
         # Pull out the segmentation class from that module
         SegModule = getattr(seg_module, seg_module_info['class'])
 
+        output_path = Path(args.output_dir)
+
         ##########################################################################
         if args.mode == PER_IMAGE:
             
@@ -178,7 +181,7 @@ class Executor(object):
 
             bw = SegModule(struct_img, self.rescale_ratio)
           
-            writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_segmentation.tiff')
+            writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / fname + '_struct_segmentation.tiff'))
             writer.save(bw)
 
         elif args.mode == PER_DIR:
@@ -195,7 +198,7 @@ class Executor(object):
 
                 bw = SegModule(struct_img, self.rescale_ratio)
 
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_segmentation.tiff')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / fn + '_struct_segmentation.tiff'))
                 writer.save(bw)
 
            
