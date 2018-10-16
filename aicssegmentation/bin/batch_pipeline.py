@@ -104,6 +104,8 @@ class Args(object):
                        help='the xy resolution of the image, default is 0.108')
         p.add_argument('--output_dir', dest='output_dir',
                        help='output directory')
+        p.add_argument('--contour', dest='save_contour', action='store_true',
+                       help='save contour plot or not')
 
 
         subparsers = p.add_subparsers(dest='mode')
@@ -167,6 +169,9 @@ class Executor(object):
         # Pull out the segmentation class from that module
         SegModule = getattr(seg_module, seg_module_info['class'])
 
+        if args.save_contour:
+            from aicssegmentation.core.utils import generate_segmentation_contour
+
         ##########################################################################
         if args.mode == PER_IMAGE:
             
@@ -180,6 +185,12 @@ class Executor(object):
           
             writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_segmentation.tiff')
             writer.save(bw)
+
+            if args.save_contour:
+                bd = generate_segmentation_contour(bw)
+
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_contour.tiff')
+                writer.save(bd)
 
         elif args.mode == PER_DIR:
 
@@ -197,6 +208,12 @@ class Executor(object):
 
                 writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_segmentation.tiff')
                 writer.save(bw)
+
+                if args.save_contour:
+                    bd = generate_segmentation_contour(bw)
+
+                    writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + + '_struct_contour.tiff')
+                    writer.save(bd)
 
            
 ###############################################################################
