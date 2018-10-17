@@ -2,7 +2,7 @@ import numpy as np
 import os
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
-from ..core.seg_dot import dot_2d
+from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
 
@@ -13,12 +13,13 @@ def FBL_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0]
+    intensity_norm_param = [0.5, 18]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_2d_sigma = 1
-    dot_2d_cutoff = 0.012
-    minArea = 10
+    dot_2d_cutoff = 0.01
+    minArea = 5
+    low_level_min_size = 700
     ##########################################################################
 
     ###################
@@ -58,15 +59,8 @@ def FBL_HiPSC_Pipeline(struct_img,rescale_ratio):
         bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
 
     # step 3: finer segmentation
-    bw_finer = np.zeros_like(bw_high_level)
-    for z_idx in range(structure_img_smooth.shape[0]):
-        frame_mask = bw_low_level[z_idx,:,:]
-        if np.any(frame_mask>0):
-            frame_raw = structure_img_smooth[z_idx,:,:]
-            response = dot_2d(frame_raw, log_sigma=dot_2d_sigma)
-            bw_finer[z_idx,:,:]=response>dot_2d_cutoff
-
-    bw_finer = remove_small_objects(bw_finer, min_size=minArea, connectivity=1, in_place=True)
+    response2d = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
+    bw_finer = remove_small_objects(response2d>dot_2d_cutoff, min_size=minArea, connectivity=1, in_place=True)
 
     # merge finer level detection into high level coarse segmentation to include outside dim parts
     bw_high_level[bw_finer>0]=1
