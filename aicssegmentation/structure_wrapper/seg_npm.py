@@ -5,6 +5,7 @@ from ..pre_processing_utils import intensity_normalization, image_smoothing_gaus
 from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
+from scipy.ndimage.morphology import binary_fill_holes
 
 def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
     ##########################################################################
@@ -17,7 +18,7 @@ def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
     gaussian_smoothing_truncate_range = 3.0
     dot_2d_sigma = 2
     dot_2d_sigma_extra = 1
-    dot_2d_cutoff = 0.012
+    dot_2d_cutoff = 0.025
     minArea = 5
     low_level_min_size = 700
     ##########################################################################
@@ -62,7 +63,10 @@ def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
     response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
     response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
 
-    inner_mask = erosion(bw_high_level, selem=ball(1))
+    inner_mask = bw_high_level.copy()
+    for zz in range(inner_mask.shape[0]):
+        inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
+
     holes = np.logical_or(response_dark>dot_2d_cutoff , response_dark_extra>dot_2d_cutoff)
     holes[~inner_mask] = 0
 
