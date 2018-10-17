@@ -168,7 +168,7 @@ class Executor(object):
         # Pull out the segmentation class from that module
         SegModule = getattr(seg_module, seg_module_info['class'])
 
-        output_path = Path(args.output_dir)
+        output_path = pathlib.Path(args.output_dir)
 
         ##########################################################################
         if args.mode == PER_IMAGE:
