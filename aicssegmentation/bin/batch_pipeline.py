@@ -37,6 +37,7 @@ STRUCTURE_MAPPING = {
     'GJA1': {'module': 'aicssegmentation.structure_wrapper.seg_gja1', 'class': 'GJA1_HiPSC_Pipeline'},
     'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},
     'NPM': {'module': 'aicssegmentation.structure_wrapper.seg_npm', 'class': 'NPM_HiPSC_Pipeline'},
+    'LAMP1': {'module': 'aicssegmentation.structure_wrapper.seg_lamp1', 'class': 'LAMP1_HiPSC_Pipeline'},
 }
 
 
