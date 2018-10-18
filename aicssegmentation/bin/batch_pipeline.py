@@ -7,6 +7,7 @@ import logging
 import argparse
 import traceback
 import importlib
+import pathlib
 
 from argparse import ArgumentParser
 import aicsimageio
@@ -171,6 +172,8 @@ class Executor(object):
         # Pull out the segmentation class from that module
         SegModule = getattr(seg_module, seg_module_info['class'])
 
+        output_path = pathlib.Path(args.output_dir)
+
         if args.save_contour:
             from aicssegmentation.core.utils import generate_segmentation_contour
 
@@ -185,13 +188,13 @@ class Executor(object):
 
             bw = SegModule(struct_img, self.rescale_ratio)
           
-            writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_segmentation.tiff')
+            writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_segmentation.tiff')))
             writer.save(bw)
 
             if args.save_contour:
                 bd = generate_segmentation_contour(bw)
 
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fname + '_struct_contour.tiff')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_contour.tiff')))
                 writer.save(bd)
 
         elif args.mode == PER_DIR:
@@ -208,13 +211,13 @@ class Executor(object):
 
                 bw = SegModule(struct_img, self.rescale_ratio)
 
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_segmentation.tiff')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / fn + '_struct_segmentation.tiff'))
                 writer.save(bw)
 
                 if args.save_contour:
                     bd = generate_segmentation_contour(bw)
 
-                    writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_contour.tiff')
+                    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
                     writer.save(bd)
 
            
