@@ -12,7 +12,11 @@ def intensity_normalization(struct_img, scaling_param):
     assert len(scaling_param)>0
 
     if len(scaling_param)==1:
-        print('intensity normalization: using min-max normalization')
+        if scaling_param[0]<1:
+            print('intensity normalization: using min-max normalization with NO absolute intensity upper bound')
+        else:
+            print(f'intensity normalization: using min-max normalization with absolute intensity upper bound {scaling_param[0]}')
+            struct_img[struct_img > scaling_param[0]] = struct_img.min()
         strech_min = struct_img.min()
         strech_max = struct_img.max()
         struct_img = (struct_img - strech_min + 1e-8)/(strech_max - strech_min + 1e-8)

@@ -12,9 +12,7 @@ def TUBA1B_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1.5, 8.0]  #TODO
-    gaussian_smoothing_sigma = 1
-    gaussian_smoothing_truncate_range = 3.0
+    intensity_norm_param = [1.5, 8.0] 
     vesselness_sigma = [1]
     vesselness_cutoff = 0.01
     minArea = 20
@@ -138,40 +136,3 @@ def Rapamycin(struct_img):
 
     return bw 
 
-'''
-def TUBA1B_HiPSC_Pipeline(struct_img,rescale_ratio):
-
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.005
-    minArea = 20
-    dynamic_range = 14
-    ##########################################################################
-
-    max_range = min(np.max(struct_img), np.median(struct_img) + dynamic_range*np.std(struct_img))
-    struct_img[struct_img>max_range] = max_range
-    struct_img = (struct_img - struct_img.min() + 1e-8)/(max_range - struct_img.min() + 1e-8)
-
-    ## remove the first frame from every frame
-    #for zz in range(struct_img.shape[0]):
-    #    struct_img[zz,:,:] = struct_img[zz,:,:] - struct_img[0,:,:]
-    #struct_img = (struct_img - struct_img.min() )/(struct_img.max() - struct_img.min())
-
-    if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
-        struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0*rescale_ratio)
-    else:
-        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0)
-
-    response = vesselness3D(img_smooth, scale_range=(1,2), scale_step=1,  tau=1, whiteonblack=True)
-    bw = response>thresh_3d
-    bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
-    
-    if rescale_ratio>0:
-        bw= processing.resize(bw, [1, 1/rescale_ratio, 1/rescale_ratio], method="nearest")
-
-    return bw     
-'''

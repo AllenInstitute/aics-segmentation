@@ -18,6 +18,15 @@ def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
 
     return bw
 
+def generate_segmentation_contour(im):
+
+    bd = np.logical_xor(erosion(im>0, selem=ball(1)), im>0)
+
+    bd = bd.astype(np.uint8)
+    bd[bd>0]=255
+
+    return bd
+
 def divide_nonzero(array1, array2):
     """
     Divides two arrays. Returns zero when dividing by zero.

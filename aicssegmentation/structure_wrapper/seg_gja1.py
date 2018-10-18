@@ -25,9 +25,9 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio):
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.025
+    dot_3d_cutoff = 0.031 # 0.025
     dot_2d_cutoff = 0.0175
-    minArea = 4
+    minArea = 5
     ##########################################################################
 
     ###################
@@ -53,7 +53,7 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio):
     response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw = response > dot_3d_cutoff
     bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
-
+    '''
     response2d = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw2d = response2d > dot_2d_cutoff
 
@@ -69,6 +69,7 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio):
             replace_where(lab_tmp, s0, 0)
             
             bw[zz,:,:] = lab_tmp>0
+    '''
     
     ###################
     # POST-PROCESSING

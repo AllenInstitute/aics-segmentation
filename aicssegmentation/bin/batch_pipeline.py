@@ -12,7 +12,7 @@ import pathlib
 from argparse import ArgumentParser
 import aicsimageio
 import aicsimageprocessing
- 
+from aicssegmentation.core.utils import generate_segmentation_contour
 
 
 ###############################################################################
@@ -35,6 +35,8 @@ STRUCTURE_MAPPING = {
     'MYH10': {'module': 'aicssegmentation.structure_wrapper.seg_myh10', 'class': 'MYH10_HiPSC_Pipeline'},
     'CTNNB1': {'module': 'aicssegmentation.structure_wrapper.seg_ctnnb1', 'class': 'CTNNB1_HiPSC_Pipeline'},
     'GJA1': {'module': 'aicssegmentation.structure_wrapper.seg_gja1', 'class': 'GJA1_HiPSC_Pipeline'},
+    'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},
+    'NPM': {'module': 'aicssegmentation.structure_wrapper.seg_npm', 'class': 'NPM_HiPSC_Pipeline'},
 }
 
 
@@ -105,6 +107,8 @@ class Args(object):
                        help='the xy resolution of the image, default is 0.108')
         p.add_argument('--output_dir', dest='output_dir',
                        help='output directory')
+        p.add_argument('--contour', dest='save_contour', action='store_true',
+                       help='save contour plot or not')
 
 
         subparsers = p.add_subparsers(dest='mode')
@@ -184,6 +188,12 @@ class Executor(object):
             writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_segmentation.tiff')))
             writer.save(bw)
 
+            if args.save_contour:
+                bd = generate_segmentation_contour(bw)
+
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_contour.tiff')))
+                writer.save(bd)
+
         elif args.mode == PER_DIR:
 
             filenames = [os.path.basename(os.path.splitext(f)[0])
@@ -200,6 +210,12 @@ class Executor(object):
 
                 writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / fn + '_struct_segmentation.tiff'))
                 writer.save(bw)
+
+                if args.save_contour:
+                    bd = generate_segmentation_contour(bw)
+
+                    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
+                    writer.save(bd)
 
            
 ###############################################################################
