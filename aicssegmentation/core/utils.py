@@ -22,7 +22,7 @@ def generate_segmentation_contour(im):
 
     bd = np.logical_xor(erosion(im>0, selem=ball(1)), im>0)
 
-    bd = bd.astype(np.unit8)
+    bd = bd.astype(np.uint8)
     bd[bd>0]=255
 
     return bd

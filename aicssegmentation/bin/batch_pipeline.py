@@ -214,7 +214,7 @@ class Executor(object):
                 if args.save_contour:
                     bd = generate_segmentation_contour(bw)
 
-                    writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + + '_struct_contour.tiff')
+                    writer = aicsimageio.omeTifWriter.OmeTifWriter(args.output_dir + fn + '_struct_contour.tiff')
                     writer.save(bd)
 
            
