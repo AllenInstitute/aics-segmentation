@@ -40,7 +40,7 @@ def TOMM20_HiPSC_Pipeline(struct_img,rescale_ratio):
     # core algorithm
     ###################
 
-    # vesselness 3d 
+    # 2d vesselness slice by slice
     response = vesselnessSliceBySlice(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
     bw = response > vesselness_cutoff
     
