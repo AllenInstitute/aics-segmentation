@@ -11,11 +11,9 @@ def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1, 4]  #TODO
-    gaussian_smoothing_sigma = 1
-    gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma = [1,2]
-    vesselness_cutoff = 0.05
+    intensity_norm_param = [2, 11] 
+    vesselness_sigma = [1]
+    vesselness_cutoff = 0.01
     minArea = 15
     ##########################################################################
 
@@ -29,7 +27,6 @@ def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     if rescale_ratio>0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-        #gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing 
     structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)

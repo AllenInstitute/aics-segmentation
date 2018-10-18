@@ -15,11 +15,9 @@ def TTN_Cardio_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1, 4]  #TODO
-    gaussian_smoothing_sigma = 1
-    gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma = [1,2]
-    vesselness_cutoff = 0.05
+    intensity_norm_param = [8, 15.5]
+    vesselness_sigma = [1]
+    vesselness_cutoff = 0.02
     minArea = 15
     ##########################################################################
 
