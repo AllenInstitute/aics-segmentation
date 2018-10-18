@@ -216,7 +216,7 @@ task publishSnapshot {
     }
 }
 
-task bumpVersionRelease {
+task bumpReleaseVersion {
     description "Update version for release - X.Y.Z.devN -> X.Y.Z"
     group "Python Version Management"
     doLast {
@@ -227,12 +227,11 @@ task bumpVersionRelease {
             args = ["--tag",  "--list", "--allow-dirty", "release"]
             standardOutput = ostream
         }
-        def output = ostream.toString()
-        println "OUT: ${output}"
+        showVersions(ostream)
     }
 }
 
-task bumpVersion {
+task bumpSnapshotVersion {
     description "Update version for next cycle - X.Y.Z -> X.Y.Z+1dev0, or next snapshot X.Y.Z.devN->X.Y.Z.devN+1"
     group "Python Version Management"
 
@@ -247,12 +246,20 @@ task bumpVersion {
             args = ["--list", "--allow-dirty", changePart]
             standardOutput = ostream
         }
-        def output = ostream.toString()
-        println "OUT: ${output}"
+        showVersions(ostream)
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+def showVersions(ostream) {
+    def output = ostream.toString()
+    println "OUT = ${output}"
+    def prev_version = output =~ /current_version=(.+)/
+    def new_version = output =~ /new_version=(.+)/
+    println "Previous version = ${prev_version[0][1]}"
+    println "New version = ${new_version[0][1]}"
+}
 
 def uploadTo(repoAlias) {
     exec {

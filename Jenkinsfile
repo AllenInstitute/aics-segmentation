@@ -34,7 +34,7 @@ node ("python-gradle")
             // This will drop the dev suffix if we are releasing
             if (create_release) {
                 // X.Y.Z.devN -> X.Y.Z
-                sh "./gradlew -i bumpVersionRelease" 
+                sh "./gradlew -i bumpReleaseVersion" 
             }            
         }
 
@@ -52,10 +52,7 @@ node ("python-gradle")
             // if snapshot build: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
 
             def bump_part = create_release ? "patch" : "devbuild"
-            sh "./gradlew -i bumpVersion -PbumpPart=${bump_part}" 
-
-            //def bump_part = create_release ? "patch" : "devbuild"
-            // sh "${PYTHON} ${VENV_BIN}/bumpversion --list ${bump_part} | grep \"current_version\\|new_version\" > bumpversion_post.out"
+            sh "./gradlew -i bumpSnapshotVersion -PbumpPart=${bump_part}" 
         }
 
         stage ("tag and push") {
