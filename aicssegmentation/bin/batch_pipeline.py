@@ -12,7 +12,7 @@ import pathlib
 from argparse import ArgumentParser
 import aicsimageio
 import aicsimageprocessing
- 
+from aicssegmentation.core.utils import generate_segmentation_contour
 
 
 ###############################################################################
@@ -173,9 +173,6 @@ class Executor(object):
         SegModule = getattr(seg_module, seg_module_info['class'])
 
         output_path = pathlib.Path(args.output_dir)
-
-        if args.save_contour:
-            from aicssegmentation.core.utils import generate_segmentation_contour
 
         ##########################################################################
         if args.mode == PER_IMAGE:
