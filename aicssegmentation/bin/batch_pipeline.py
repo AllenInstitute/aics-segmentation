@@ -12,7 +12,7 @@ import pathlib
 from argparse import ArgumentParser
 import aicsimageio
 import aicsimageprocessing
-from aicssegmentation.core.utils import generate_segmentation_contour
+from aicssegmentation.core.utils import save_segmentation
 
 
 ###############################################################################
@@ -185,14 +185,7 @@ class Executor(object):
 
             bw = SegModule(struct_img, self.rescale_ratio)
           
-            writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_segmentation.tiff')))
-            writer.save(bw)
-
-            if args.save_contour:
-                bd = generate_segmentation_contour(bw)
-
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fname + '_struct_contour.tiff')))
-                writer.save(bd)
+            save_segmentation(bw, args.save_contour, output_path, fname)
 
         elif args.mode == PER_DIR:
 
@@ -208,14 +201,7 @@ class Executor(object):
 
                 bw = SegModule(struct_img, self.rescale_ratio)
 
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / fn + '_struct_segmentation.tiff'))
-                writer.save(bw)
-
-                if args.save_contour:
-                    bd = generate_segmentation_contour(bw)
-
-                    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
-                    writer.save(bd)
+                save_segmentation(bw, args.save_contour, output_path, fn)
 
            
 ###############################################################################

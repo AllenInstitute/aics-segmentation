@@ -2,6 +2,7 @@ import numpy as np
 from skimage.morphology import medial_axis
 from scipy.ndimage import distance_transform_edt
 from skimage.morphology import erosion, ball
+import aicsimageio
 
 def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
 
@@ -17,6 +18,17 @@ def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
     bw[np.logical_and(safe_zone, rm_candidate)]=0
 
     return bw
+
+def save_segmentation(bw, contour_flag, output_path, fn):
+
+    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_segmentation.tiff')))
+    writer.save(bw)
+
+    if contour_flag:
+        bd = generate_segmentation_contour(bw)
+
+        writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
+        writer.save(bd)
 
 def generate_segmentation_contour(im):
 
