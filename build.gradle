@@ -59,7 +59,7 @@ class PyExtension {
 
     def env = makeEnv(venv)
 
-    Map<String,String> makeEnv(String name) {
+    static Map<String,String> makeEnv(String name) {
         // This mimics the environment manipulations of the venv activate script
         def map = new HashMap<String,String>(System.getenv())
         map.put("VIRTUAL_ENV", new File("venv/${name}").getAbsolutePath())
@@ -68,8 +68,8 @@ class PyExtension {
         return map
     }
 }
-
 project.extensions.create('py', PyExtension)
+File versionFile   = file("${rootProject.name}/version.py")
 
 wrapper {
     gradleVersion "5.0-milestone-1"
@@ -216,63 +216,132 @@ task publishSnapshot {
     }
 }
 
-task bumpReleaseVersion {
+task bumpVersionRelease {
     description "Update version for release - X.Y.Z.devN -> X.Y.Z"
     group "Python Version Management"
+
+    inputs.file(versionFile)
+    outputs.file(versionFile)
+
     doLast {
-        ByteArrayOutputStream ostream = new ByteArrayOutputStream()
-        exec {
-            environment py.env
-            executable = py.bumpversion
-            args = ["--tag",  "--list", "--allow-dirty", "release"]
-            standardOutput = ostream
+        def version = getModuleVersion(versionFile)
+        if (!version.contains(".dev")) {
+            String message = "ERROR:\n" +
+                    "The current version ${version} is not a snapshot (.devN) version. It cannot be bumped for release."
+            throw new GradleException(message)
         }
-        showVersions(ostream)
+
+        def bv = bumpTheVersion(["--tag",  "--list", "--allow-dirty", "release"])
+        logger.info("Version changed from snapshot to relase version.")
+        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
     }
 }
 
-task bumpSnapshotVersion {
-    description "Update version for next cycle - X.Y.Z -> X.Y.Z+1dev0, or next snapshot X.Y.Z.devN->X.Y.Z.devN+1"
+task bumpVersionDev {
+    description "Update dev version within a snapshot - X.Y.Z.devN->X.Y.Z.devN+1"
     group "Python Version Management"
 
-    def changePart = "patch"
+    inputs.file(versionFile)
+    outputs.file(versionFile)
 
-     // sh "${PYTHON} ${VENV_BIN}/bumpversion --list ${bump_part} | grep \"current_version\\|new_version\" > bumpversion_post.out"
     doLast {
-        ByteArrayOutputStream ostream = new ByteArrayOutputStream()
-        exec {
-            environment py.env
-            executable = py.bumpversion
-            args = ["--list", "--allow-dirty", changePart]
-            standardOutput = ostream
+        def version = getModuleVersion(versionFile)
+        if (!version.contains(".dev")) {
+            String message = "ERROR:\n" +
+                    "The current version (${version}) DOES NOT contain '.dev'. It cannot be bumped for next dev version."
+            throw new GradleException(message)
         }
-        showVersions(ostream)
+
+        def bv = bumpTheVersion(["--list", "--allow-dirty", "devbuild"])
+        logger.info("Snapshot dev version bumped.")
+        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+    }
+}
+
+task bumpVersionPostRelease {
+    description "Update version for next cycle - X.Y.Z -> X.Y.Z+1dev0"
+    group "Python Version Management"
+
+    inputs.file(versionFile)
+    outputs.file(versionFile)
+
+    doLast {
+        // If you want to change the minor or major values for the next release, call this on the command line as
+        // ./gradlew bumpVersionPostRelease -PbumpPartOverride=<value>
+        // where the value is either minor or major
+
+        def changePart = "patch"
+        if (project.hasProperty('bumpPartOverride') && bumpPartOverride != changePart) {
+            if (!["minor", "major"]) {
+                throw new GradleException("ERROR:\nThe bumpPartOverride must be one of the following: minor, major")
+            }
+            logger.info("User is overriding the default bump part: ${changePart} -> ${bumpPartOverride}")
+            changePart = bumpPartOverride
+        }
+
+        def bv = bumpTheVersion(["--list", "--allow-dirty", changePart])
+        logger.info("Version bumped for next round of development.")
+        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+    }
+}
+
+task gitPushWithTag {
+    description "Post-release/publish task to push the tag and the new version to git"
+    group "Python Version Management"
+
+    doLast {
+
+    }
+}
+
+task gitPush {
+    description "Post-snapshot/publish task to the new snapshot version to git"
+    group "Python Version Management"
+
+    doLast {
+
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-def showVersions(ostream) {
-    def output = ostream.toString()
-    println "OUT = ${output}"
-    def prev_version = output =~ /current_version=(.+)/
-    def new_version = output =~ /new_version=(.+)/
-    println "Previous version = ${prev_version[0][1]}"
-    println "New version = ${new_version[0][1]}"
-}
-
 def uploadTo(repoAlias) {
     exec {
-        environment py.env
-        executable py.twine
-        args "upload -r ${repoAlias} dist/*.whl"
+        environment = py.env
+        executable = py.twine
+        args = ["upload", "-r", "${repoAlias}", "dist/*.whl"]
     }
 }
 
 def run(pyExec, pyArgs) {
     exec {
-        environment py.env
+        environment = py.env
         executable = pyExec
         args = pyArgs
     }
+}
+
+class VersionInfo {
+    String oldVersion = ""
+    String newVersion = ""
+}
+
+def bumpTheVersion(bvArgs) {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+    exec {
+        environment = py.env
+        executable = py.bumpversion
+        args = bvArgs
+        standardOutput = outputStream
+    }
+    def output = outputStream.toString()
+    def info = new VersionInfo()
+    info.oldVersion = (output =~ /current_version=(.+)/)[0][1]
+    info.newVersion = (output =~ /new_version=(.+)/)[0][1]
+    return info
+}
+
+static def getModuleVersion(versionFile) {
+    def match = versionFile.filterLine { it =~ /^MODULE_VERSION/ } =~ /\"(.*)\"/
+    return match[0][1]
 }
