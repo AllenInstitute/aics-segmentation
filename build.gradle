@@ -74,6 +74,7 @@ class PyExtension {
 
 project.extensions.create('py', PyExtension)
 File pythonVersionFile = file("${rootProject.name}/version.py")
+File bumpVersionCfgFile = file("${projectDir}/.bumpversion.cfg")
 
 wrapper {
     gradleVersion "5.0-milestone-1"
@@ -289,7 +290,7 @@ task bumpVersionPostRelease {
     }
 }
 
-task gitPushWithTag {
+task gitTagCommitPush {
     description "Post-release/publish task to push the tag and the new version to git"
     group "Python Version Management"
 
@@ -299,18 +300,34 @@ task gitPushWithTag {
         def moduleVersion = getModuleVersion(pythonVersionFile)
         def gr = grgit.open()
         def status = gr.status()
-        println(status)
+
+        gr.tag.add(name: "v${moduleVersion}", message: "Published release ${moduleVersion}")
+
+        println(status.unstaged.modified)
     }
 }
 
-task gitPush {
+task gitCommitPush {
     description "Post-snapshot/publish task to the new snapshot version to git"
     group "Python Version Management"
 
     inputs.file(pythonVersionFile)
+    inputs.file(bumpVersionCfgFile)
 
     doLast {
+        def moduleVersion = getModuleVersion(pythonVersionFile)
+        def vcs = grgit.open()
 
+        def modified = vcs.status().unstaged['modified']
+        println(vcs.status().unstaged)
+        inputs.files.forEach {
+            // We make the inputs relative to match modified
+            def path = it.toString().replaceAll("${projectDir}/", "")
+            if (modified.contains(path)) {
+                vcs.add(patterns: [path])
+            }
+        }
+        println(vcs.status().staged)
     }
 }
 
