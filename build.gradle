@@ -51,11 +51,14 @@ class PyExtension {
     // The executables, with the path
     String python      = "${binPath}/python3"       // The python executable name
     String pip         = "${binPath}/pip3"          // Install requirements and update virtual env
+    
     String flake8      = "${binPath}/flake8"        // Lint the code
+    String pytest      = "${binPath}/pytest"        // Used for testing
+    
+    String jupyter     = "${binPath}/jupyter"       // For Jupyter notebooks (if used)
+    
     String twine       = "${binPath}/twine"         // Upload/publish to PyPi repos
     String bumpversion = "${binPath}/bumpversion"   // Manage versions
-    String pytest      = "${binPath}/pytest"        // Used for testing
-    String jupyter     = "${binPath}/jupyter"       // For Jupyter notebooks (if used)
 
     def env = makeEnv(venv)
 
@@ -68,8 +71,9 @@ class PyExtension {
         return map
     }
 }
+
 project.extensions.create('py', PyExtension)
-File versionFile   = file("${rootProject.name}/version.py")
+File pythonVersionFile = file("${rootProject.name}/version.py")
 
 wrapper {
     gradleVersion "5.0-milestone-1"
@@ -116,7 +120,7 @@ task createVirtualEnvEmpty {
     description "Create the project virtual env in ${py.venvRoot}/${py.venv}"
     group "Python Virtual Environment Management"
 
-    outputs.dirs(py.venvRoot)
+    outputs.dirs("${py.venvRoot}")
     outputs.file("${py.binPath}/activate")
 
     doLast {
@@ -145,7 +149,7 @@ task installJupyterDependencies  {
     group "Python Virtual Environment Management"
 
     dependsOn installDependencies
-    outputs.file(py.jupyter)
+    outputs.files([py.jupyter])
 
     doLast {
         run(py.pip, ["install", "-e", ".[jupyter_group]"])
@@ -220,18 +224,18 @@ task bumpVersionRelease {
     description "Update version for release - X.Y.Z.devN -> X.Y.Z"
     group "Python Version Management"
 
-    inputs.file(versionFile)
-    outputs.file(versionFile)
+    inputs.file(pythonVersionFile)
+    outputs.file(pythonVersionFile)
 
     doLast {
-        def version = getModuleVersion(versionFile)
+        def version = getModuleVersion(pythonVersionFile)
         if (!version.contains(".dev")) {
             String message = "ERROR:\n" +
                     "The current version ${version} is not a snapshot (.devN) version. It cannot be bumped for release."
             throw new GradleException(message)
         }
 
-        def bv = bumpTheVersion(["--tag",  "--list", "--allow-dirty", "release"])
+        def bv = bumpTheVersion(["--list", "--allow-dirty", "release"])
         logger.info("Version changed from snapshot to relase version.")
         logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
     }
@@ -241,11 +245,11 @@ task bumpVersionDev {
     description "Update dev version within a snapshot - X.Y.Z.devN->X.Y.Z.devN+1"
     group "Python Version Management"
 
-    inputs.file(versionFile)
-    outputs.file(versionFile)
+    inputs.file(pythonVersionFile)
+    outputs.file(pythonVersionFile)
 
     doLast {
-        def version = getModuleVersion(versionFile)
+        def version = getModuleVersion(pythonVersionFile)
         if (!version.contains(".dev")) {
             String message = "ERROR:\n" +
                     "The current version (${version}) DOES NOT contain '.dev'. It cannot be bumped for next dev version."
@@ -262,8 +266,8 @@ task bumpVersionPostRelease {
     description "Update version for next cycle - X.Y.Z -> X.Y.Z+1dev0"
     group "Python Version Management"
 
-    inputs.file(versionFile)
-    outputs.file(versionFile)
+    inputs.file(pythonVersionFile)
+    outputs.file(pythonVersionFile)
 
     doLast {
         // If you want to change the minor or major values for the next release, call this on the command line as
@@ -289,8 +293,13 @@ task gitPushWithTag {
     description "Post-release/publish task to push the tag and the new version to git"
     group "Python Version Management"
 
-    doLast {
+    inputs.file(pythonVersionFile)
 
+    doLast {
+        def moduleVersion = getModuleVersion(pythonVersionFile)
+        def gr = grgit.open()
+        def status = gr.status()
+        println(status)
     }
 }
 
@@ -298,8 +307,19 @@ task gitPush {
     description "Post-snapshot/publish task to the new snapshot version to git"
     group "Python Version Management"
 
+    inputs.file(pythonVersionFile)
+
     doLast {
 
+    }
+}
+
+task checkModuleVersion {
+    inputs.file(pythonVersionFile)
+
+    doLast {
+        def moduleVersion = getModuleVersion(pythonVersionFile)
+        println(moduleVersion)
     }
 }
 
@@ -342,6 +362,13 @@ def bumpTheVersion(bvArgs) {
 }
 
 static def getModuleVersion(versionFile) {
-    def match = versionFile.filterLine { it =~ /^MODULE_VERSION/ } =~ /\"(.*)\"/
+    def versionLineFilter = versionFile.filterLine { it =~ /\s*MODULE_VERSION\s*=\s*"\d+\.\d+\.\d+(\.dev\d+)?"/ }
+    def versionLine = versionLineFilter.toString()
+    if (versionLine.isEmpty()) {
+        throw new GradleException("ERROR:\n" +
+                "Expected a line of the following form in version file ${versionFile}\n" +
+                "MODULE_VERSION = \"X.Y.Z[.devN]\"")
+    }
+    def match = versionLine =~ /"(.*)"/
     return match[0][1]
 }
