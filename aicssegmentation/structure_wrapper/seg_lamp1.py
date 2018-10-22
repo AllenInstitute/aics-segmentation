@@ -16,19 +16,21 @@ def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio):
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
 
-    minArea = 50
+    minArea = 15
     ves_th_2d =0.1
 
     vesselness_sigma = [1]
     vesselness_cutoff = 0.15
 
-    hole_min = 80
+    #hole_min = 60
     hole_max = 1600
 
     log_sigma_1 = 5
     log_cutoff_1 = 0.09
-    log_sigma_2 = 1
-    log_cutoff_2 = 0.03
+    log_sigma_2 = 2.5
+    log_cutoff_2 = 0.07
+    log_sigma_3 = 1
+    log_cutoff_3 = 0.01
     ##########################################################################
 
     # intenisty normalization
@@ -47,6 +49,9 @@ def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio):
     response2 = dot_slice_by_slice(structure_img_smooth, log_sigma=log_sigma_2)
     bw2 = response2> log_cutoff_2
     bw_spot = np.logical_or(bw1, bw2)
+    response3 = dot_slice_by_slice(structure_img_smooth, log_sigma=log_sigma_3)
+    bw3 = response3> log_cutoff_3
+    bw_spot = np.logical_or(bw_spot, bw3)
 
     # ring/filament detection
     ves = vesselnessSliceBySlice(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
@@ -64,14 +69,19 @@ def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio):
         too_big = component_sizes >hole_max
         too_big_mask = too_big[background_lab]
         out[too_big_mask] = 0
-        too_small = component_sizes <hole_min
-        too_small_mask = too_small[background_lab]
-        out[too_small_mask] = 0
+        #too_small = component_sizes <hole_min
+        #too_small_mask = too_small[background_lab]
+        #out[too_small_mask] = 0
 
         holes[zz,:,:] = out
 
     full_fill = np.logical_or(partial_fill, holes)
 
-    bw = remove_small_objects(full_fill, min_size=minArea, connectivity=1, in_place=False)
+    seg = remove_small_objects(full_fill, min_size=minArea, connectivity=1, in_place=False)
+
+    # output
+    seg = seg>0
+    seg = seg.astype(np.uint8)
+    seg[seg>0]=255
     
-    return bw
+    return seg

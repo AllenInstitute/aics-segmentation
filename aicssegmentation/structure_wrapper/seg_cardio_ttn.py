@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from ..core.seg_dot import dot_3d
 from ..core.vessel import vesselness3D
 from skimage.feature import peak_local_max
@@ -31,10 +31,10 @@ def TTN_Cardio_Pipeline(struct_img,rescale_ratio):
     if rescale_ratio>0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-        gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
+        #gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing with gaussian filter
-    structure_img_smooth = image_smoothing_gaussian_slice_by_slice(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+    structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)  
 
     ###################
     # core algorithm

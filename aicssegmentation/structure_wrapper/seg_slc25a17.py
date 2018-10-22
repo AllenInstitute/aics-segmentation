@@ -8,18 +8,18 @@ from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
 
 
-def SLC15A27_HiPSC_Pipeline(struct_img,rescale_ratio):
+def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0]
+    intensity_norm_param = [6000]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.012
-    minArea = 4
+    dot_3d_cutoff = 0.02
+    minArea = 5
     ##########################################################################
 
     ###################
@@ -62,4 +62,3 @@ def SLC15A27_HiPSC_Pipeline(struct_img,rescale_ratio):
     seg[seg>0]=255
 
     return seg
-

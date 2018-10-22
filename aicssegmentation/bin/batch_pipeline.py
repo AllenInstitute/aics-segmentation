@@ -36,8 +36,12 @@ STRUCTURE_MAPPING = {
     'CTNNB1': {'module': 'aicssegmentation.structure_wrapper.seg_ctnnb1', 'class': 'CTNNB1_HiPSC_Pipeline'},
     'GJA1': {'module': 'aicssegmentation.structure_wrapper.seg_gja1', 'class': 'GJA1_HiPSC_Pipeline'},
     'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},
-    'NPM': {'module': 'aicssegmentation.structure_wrapper.seg_npm', 'class': 'NPM_HiPSC_Pipeline'},
+    'NPM1': {'module': 'aicssegmentation.structure_wrapper.seg_npm1', 'class': 'NPM1_HiPSC_Pipeline'},
     'LAMP1': {'module': 'aicssegmentation.structure_wrapper.seg_lamp1', 'class': 'LAMP1_HiPSC_Pipeline'},
+    'RAB5A': {'module': 'aicssegmentation.structure_wrapper.seg_rab5a', 'class': 'RAB5A_HiPSC_Pipeline'},
+    'SLC25A17': {'module': 'aicssegmentation.structure_wrapper.seg_slc25a17', 'class': 'SLC25A17_HiPSC_Pipeline'},
+    'TNNI1_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_tnni1', 'class': 'TNNI1_Cardio_Pipeline'},
+    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'},
 }
 
 
@@ -148,7 +152,7 @@ class Executor(object):
 
         ##########################################################################
         # Algorithm PARAMETERS:
-        if args.struct_name.endswith('cardio'):
+        if args.struct_name.endswith('Cardio'):
             print('using cardio default resolution')
             standard_xy = 0.135
         else:
