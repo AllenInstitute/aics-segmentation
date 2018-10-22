@@ -2,15 +2,17 @@
 
 node ("python-gradle")
 {
-    parameters { booleanParam(name: 'promote_artifact', defaultValue: false, description: '') }
-    def is_promote=(params.promote_artifact)
-    echo "BUILDTYPE: " + (is_promote ? "Promote Image" : "Build, Publish and Tag")
+    // parameters { booleanParam(name: 'promote_artifact', defaultValue: false, description: '') }
+    // def is_promote=(params.promote_artifact)
+    // echo "BUILDTYPE: " + (is_promote ? "Promote Image" : "Build, Publish and Tag")
+    parameters { booleanParam(name: 'create_release', defaultValue: false, 
+                              description: 'If true, create a release artifact and publish to ' +
+                                           'the artifactory release PyPi or public PyPi.') }
+    def create_release=(params.create_release)
+    echo "BUILDTYPE: " + (create_release ? "Creating a Release" : "Building a Snapshot")
 
     try {
-        def VENV_BIN = "/local1/virtualenvs/jenkinstools/bin"
-        def PYTHON = "${VENV_BIN}/python3"
-
-        stage ("git") {
+        stage ("git pull") {
             def git_url=gitUrl()
             if (env.BRANCH_NAME == null) {
                 git url: "${git_url}"
@@ -21,25 +23,39 @@ node ("python-gradle")
             }
         }
 
-        if (!is_promote) {
-            stage ("prepare version") {
-                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s prepare"
-            }
-
-            stage("build and publish") {
-                sh './gradlew -i cleanAll publish'
-            }
-
-            stage ("tag and commit") {
-                sh "${PYTHON} ${VENV_BIN}/manage_version -t python -s tag"
-            }
-
-            junit "build/test_report.xml"
+        stage ("initialize virtualenv") {
+            sh "./gradlew -i cleanAll installCIDependencies"
         }
-        else {
-            stage("promote") {
-                sh "${PYTHON} ${VENV_BIN}/promote_artifact -t python -g ${params.git_tag}"
+
+        stage ("bump version pre-build") {
+            // This will drop the dev suffix if we are releasing
+            if (create_release) {
+                // X.Y.Z.devN -> X.Y.Z
+                sh "./gradlew -i bumpVersionRelease"
             }
+        }
+
+        stage ("test/build distribution") {
+            sh './gradlew -i build'
+        }
+
+        stage ("publish") {
+            def publish_task = create_release ? "publishRelease" : "publishSnapshot"
+            sh "./gradlew -i ${publish_task}"
+        }
+
+        stage ("tag release") {
+            if (create_release) {
+                sh "./gradlew -i gitTagCommitPush"
+            }
+        }
+
+        stage ("prep for dev") {
+            // if after release build: X.Y.Z -> X.Y.Z+1.dev0  (patch)
+            // if snapshot build: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
+            def bumpTask = create_release ? "bumpVersionPostRelease" : "bumpVersionDev"
+            sh "./gradlew -i ${bumpTask}"
+            sh "./gradlew -i gitCommitPush"
         }
 
         currentBuild.result = "SUCCESS"
