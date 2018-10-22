@@ -3,7 +3,19 @@ import numpy as np
 
 
 def dot_3d(struct_img, log_sigma):
+    
+    assert len(struct_img.shape)==3 
+    
     responce = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img, log_sigma)
+    
+    return responce
+
+def dot_2d(struct_img, log_sigma):
+    
+    assert len(struct_img.shape)==2 
+
+    responce = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img, log_sigma)
+    
     return responce
 
 def dot_slice_by_slice(struct_img, log_sigma):

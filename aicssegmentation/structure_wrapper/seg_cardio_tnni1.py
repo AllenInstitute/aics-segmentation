@@ -1,26 +1,26 @@
 import numpy as np
 import os
-from skimage.morphology import remove_small_objects, erosion, ball
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
-from ..core.seg_dot import dot_slice_by_slice
-from skimage.filters import threshold_triangle, threshold_otsu
+from skimage.morphology import remove_small_objects, watershed, dilation, ball
+from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.seg_dot import dot_3d
+from ..core.vessel import vesselness3D
+from skimage.feature import peak_local_max
+from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
-from scipy.ndimage.morphology import binary_fill_holes
 
-def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
+
+def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0.5, 15]
+    intensity_norm_param = [1, 4]  #TODO
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    dot_2d_sigma = 2
-    dot_2d_sigma_extra = 1
-    dot_2d_cutoff = 0.025
-    minArea = 5
-    low_level_min_size = 700
+    vesselness_sigma = [1,2]
+    vesselness_cutoff = 0.05
+    minArea = 15
     ##########################################################################
 
     ###################
@@ -36,50 +36,20 @@ def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
     # smoothing with gaussian filter
-    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+    structure_img_smooth = image_smoothing_gaussian_slice_by_slice(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
     ###################
     # core algorithm
     ###################
 
-    # step 1: low level thresholding
-    #global_otsu = threshold_otsu(structure_img_smooth)
-    global_tri = threshold_triangle(structure_img_smooth)
-    global_median = np.percentile(structure_img_smooth,50)
-
-    th_low_level = (global_tri + global_median)/2
-    bw_low_level = structure_img_smooth > th_low_level
-    bw_low_level = remove_small_objects(bw_low_level, min_size=low_level_min_size, connectivity=1, in_place=True)
-
-    # step 2: high level thresholding
-    bw_high_level = np.zeros_like(bw_low_level)
-    lab_low, num_obj = label(bw_low_level, return_num=True, connectivity=1)
-    for idx in range(num_obj):
-        single_obj = (lab_low==(idx+1))
-        local_otsu = threshold_otsu(structure_img_smooth[single_obj])
-        bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
-
-    response_bright = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
-    response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
-    response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
-
-    inner_mask = bw_high_level.copy()
-    for zz in range(inner_mask.shape[0]):
-        inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
-
-    holes = np.logical_or(response_dark>dot_2d_cutoff , response_dark_extra>dot_2d_cutoff)
-    holes[~inner_mask] = 0
-
-    bw_extra = response_bright>dot_2d_cutoff
-    bw_extra[~bw_high_level]=0
-
-    bw_final = np.logical_or(bw_extra, bw_high_level)
-    bw_final[holes]=0
-
+    # vesselness 3d 
+    response = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
+    bw = response > vesselness_cutoff
+    
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw_final, min_size=minArea, connectivity=1, in_place=True)
+    seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0
@@ -87,6 +57,7 @@ def NPM_HiPSC_Pipeline(struct_img,rescale_ratio):
     seg[seg>0]=255
 
     return seg
+
 
 '''
 drug:
@@ -98,7 +69,7 @@ drug:
 5: Rapamycin
 '''
 
-def NPM_drug(img, drug_type):
+def ACTN1_drug(img, drug_type):
 
     if drug_type==0:
         bw = Vehicle(img)
@@ -191,3 +162,53 @@ def Rapamycin(struct_img):
     ##########################################################################
 
     return bw 
+
+
+'''
+def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
+    ##########################################################################
+    # PARAMETERS:
+    #   note that these parameters are supposed to be fixed for the structure
+    #   and work well accross different datasets
+    thresh_3d = 0.05 #0.04
+    minArea = 12
+    dynamic_range = 10
+    ##########################################################################
+
+    # intenisty normalization (min/max)
+    max_range = min(np.max(struct_img), np.median(struct_img) + dynamic_range*np.std(struct_img))
+    struct_img[struct_img>max_range] = max_range
+    struct_img = (struct_img - struct_img.min() + 1e-8)/(max_range - struct_img.min() + 1e-8)
+    
+    # rescale if needed
+    
+    if rescale_ratio>0:
+        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
+        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0*rescale_ratio)
+    else:
+        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0)
+
+    response = vesselness3D(img_smooth, scale_range=(1,3), scale_step=1,  tau=1, whiteonblack=True)
+    # range = (1,3) --> sigma = 1, 2 (3 is not included)
+
+    # thresholding the response
+    bw = response>thresh_3d
+    bw = remove_small_objects(bw, min_size=minArea, connectivity=3, in_place=False)
+
+    for zz in range(bw.shape[0]):
+        tmp = bw[zz,:,:]
+        tmp = remove_small_objects(tmp, min_size=minArea//2, connectivity=2)
+        bw[zz,:,:] = tmp
+
+    if rescale_ratio>0:
+        bw = processing.resize(bw, [1, 1/rescale_ratio, 1/rescale_ratio], method="nearest")
+        #bw_high_level = processing.resize(bw_high_level, [1, 1/rescale_ratio, 1/rescale_ratio], method="nearest")
+
+    bw = bw.astype(np.uint8)
+    bw[bw>0]=255
+
+    return bw
+'''
+
+

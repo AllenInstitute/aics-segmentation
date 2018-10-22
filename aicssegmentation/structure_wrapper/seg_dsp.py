@@ -1,6 +1,5 @@
 import numpy as np
 import os
-from argparse import ArgumentParser
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from ..core.seg_dot import dot_3d
@@ -15,12 +14,12 @@ def DSP_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    dot_3d_cutoff = 0.012
-    intensity_norm_param = [0]
+    intensity_norm_param = [8000]
     gaussian_smoothing_sigma = 1
-    dot_3d_sigma = 1
-    minArea = 4
     gaussian_smoothing_truncate_range = 3.0
+    dot_3d_sigma = 1
+    dot_3d_cutoff = 0.012
+    minArea = 4
     ##########################################################################
 
     ###################

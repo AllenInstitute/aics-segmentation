@@ -23,9 +23,11 @@ def readme():
 test_deps = ['pytest']
 lint_deps = ['flake8']
 interactive_dev_deps = [
-    'matplotlib>=2.0.0',
+    'matplotlib>=2.2.3',
     'jupyter',
-    'itkwidgets'
+    'itkwidgets==0.12.2',
+    'ipython==7.0.1',
+    'ipywidgets==7.4.1'
 ]
 extras = {
     'test_group': test_deps,
@@ -41,16 +43,19 @@ setup(name=PACKAGE_NAME,
       author_email='jianxuc@alleninstitute.org',
       license='Allen Institute Software License',
       packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
-      # entry_points={
-      #    "console_scripts": [
-      #        "cleanup={}.bin.cleanup_1_collect_str_seg:main".format(PACKAGE_NAME)
-      #    ]
-      # },
+      entry_points={
+          "console_scripts": [
+              "batch_pipeline={}.bin.batch_pipeline:main".format(PACKAGE_NAME)
+          ]
+      },
       install_requires=[
-          'numpy',
-          'scipy',
-          'pandas',
-          'scikit-image>=0.13.1'
+          'numpy>=1.15.1',
+          'scipy>=1.1.0',
+          'scikit-image>=0.14.0',
+          'pandas>=0.23.4',
+          'aicsimageio>=0.4.3',
+          'aicsimageprocessing',
+          'numba>=0.40.0'
       ],
 
       # For test setup. This will allow JUnit XML output for Jenkins

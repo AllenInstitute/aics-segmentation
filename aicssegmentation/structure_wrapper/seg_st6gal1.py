@@ -1,12 +1,81 @@
 import numpy as np
 import os
-from argparse import ArgumentParser
-from aicsimage import processing, io
-from .vessel import vesselness3D, vesselness2D
-from scipy import ndimage as ndi
-from skimage.morphology import remove_small_objects, dilation, erosion, ball, disk, skeletonize, skeletonize_3d
-from .utils import histogram_otsu
-import math
+from skimage.morphology import remove_small_objects, erosion, ball, dilation
+from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
+from ..core.seg_dot import dot_3d
+from skimage.measure import label
+from skimage.filters import threshold_triangle, threshold_otsu
+from aicssegmentation.core.utils import morphology_preserving_thinning
+
+def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio):
+    ##########################################################################
+    # PARAMETERS:
+    #   note that these parameters are supposed to be fixed for the structure
+    #   and work well accross different datasets
+    
+    intensity_norm_param = [9, 19] 
+    gaussian_smoothing_sigma = 1
+    gaussian_smoothing_truncate_range = 3.0
+    cell_wise_min_area = 1200
+    dot_3d_sigma = 1.6
+    dot_3d_cutoff = 0.04
+    minArea = 10
+    ##########################################################################
+
+    ###################
+    # PRE_PROCESSING
+    ###################
+    # intenisty normalization (min/max)
+    struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
+    
+    # rescale if needed
+    if rescale_ratio>0:
+        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
+        gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
+
+    # smoothing with gaussian filter
+    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+
+    ###################
+    # core algorithm
+    ###################
+
+    # cell-wise local adaptive thresholding
+    th_low_level = threshold_triangle(structure_img_smooth)
+    
+    bw_low_level = structure_img_smooth > th_low_level
+    bw_low_level = remove_small_objects(bw_low_level, min_size=cell_wise_min_area, connectivity=1, in_place=True)
+    bw_low_level = dilation(bw_low_level,selem=ball(2))
+    
+    bw_high_level = np.zeros_like(bw_low_level)
+    lab_low, num_obj = label(bw_low_level, return_num=True, connectivity=1)
+
+    for idx in range(num_obj):
+        single_obj = lab_low==(idx+1)
+        local_otsu = threshold_otsu(structure_img_smooth[single_obj>0])
+        bw_high_level[np.logical_and(structure_img_smooth>local_otsu*0.98, single_obj)]=1
+
+    bw_high_level = morphology_preserving_thinning(bw_high_level, 1.6, 1)
+
+    # LOG 3d to capture spots
+    response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
+    bw_extra = response > dot_3d_cutoff
+
+    # combine the two parts
+    bw = np.logical_or(bw_high_level, bw_extra)
+    
+    ###################
+    # POST-PROCESSING
+    ###################
+    seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
+
+    # output
+    seg = seg>0
+    seg = seg.astype(np.uint8)
+    seg[seg>0]=255
+
+    return seg
 
 
 '''

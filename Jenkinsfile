@@ -6,15 +6,12 @@ node ("python-gradle")
     // def is_promote=(params.promote_artifact)
     // echo "BUILDTYPE: " + (is_promote ? "Promote Image" : "Build, Publish and Tag")
     parameters { booleanParam(name: 'create_release', defaultValue: false, 
-                              description: 'If true, create a release artifact and publish to the artifactory release PyPi or public PyPi.') }
+                              description: 'If true, create a release artifact and publish to ' +
+                                           'the artifactory release PyPi or public PyPi.') }
     def create_release=(params.create_release)
     echo "BUILDTYPE: " + (create_release ? "Creating a Release" : "Building a Snapshot")
 
     try {
-        // def VENV_BIN = "/local1/virtualenvs/jenkinstools/bin"
-        def VENV_BIN = "./venv/x3/bin"
-        def PYTHON = "${VENV_BIN}/python3"
-
         stage ("git pull") {
             def git_url=gitUrl()
             if (env.BRANCH_NAME == null) {

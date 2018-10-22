@@ -1,5 +1,43 @@
 import numpy as np
+from skimage.morphology import medial_axis
+from scipy.ndimage import distance_transform_edt
+from skimage.morphology import erosion, ball
+import aicsimageio
 
+def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
+
+    safe_zone = np.zeros_like(bw)
+    for zz in range(bw.shape[0]):
+        if np.any(bw[zz,:,:]):
+            ctl = medial_axis(bw[zz,:,:]>0)
+            dist = distance_transform_edt(ctl==0)
+            safe_zone[zz,:,:] = dist > min_thickness +1e-5
+
+    rm_candidate = np.logical_xor(bw>0, erosion(bw>0, ball(thin)))
+
+    bw[np.logical_and(safe_zone, rm_candidate)]=0
+
+    return bw
+
+def save_segmentation(bw, contour_flag, output_path, fn):
+
+    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_segmentation.tiff')))
+    writer.save(bw)
+
+    if contour_flag:
+        bd = generate_segmentation_contour(bw)
+
+        writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
+        writer.save(bd)
+
+def generate_segmentation_contour(im):
+
+    bd = np.logical_xor(erosion(im>0, selem=ball(1)), im>0)
+
+    bd = bd.astype(np.uint8)
+    bd[bd>0]=255
+
+    return bd
 
 def divide_nonzero(array1, array2):
     """
