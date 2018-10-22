@@ -35,7 +35,7 @@ node ("python-gradle")
             if (create_release) {
                 // X.Y.Z.devN -> X.Y.Z
                 sh "./gradlew -i bumpVersionRelease"
-            }            
+            }
         }
 
         stage ("test/build distribution") {
@@ -45,6 +45,12 @@ node ("python-gradle")
         stage ("publish") {
             def publish_task = create_release ? "publishRelease" : "publishSnapshot"
             sh "./gradlew -i ${publish_task}"
+        }
+
+        stage ("tag release") {
+            if (create_release) {
+                sh "./gradlew -i gitTagCommitPush"
+            }
         }
 
         stage ("bump version post-build") {

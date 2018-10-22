@@ -295,15 +295,18 @@ task gitTagCommitPush {
     group "Python Version Management"
 
     inputs.file(pythonVersionFile)
+    inputs.file(bumpVersionCfgFile)
 
     doLast {
+        def vcs = grgit.open()
         def moduleVersion = getModuleVersion(pythonVersionFile)
-        def gr = grgit.open()
-        def status = gr.status()
+        def branchName = vcs.branch.current().getName()
+        def commit = commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Published release ${moduleVersion}")
+        vcs.tag.add(name: "${moduleVersion}", message: "Tagged release ${moduleVersion}", pointsTo: commit, annotate: true)
+        // Now push the committed files and the tag!
 
-        gr.tag.add(name: "v${moduleVersion}", message: "Published release ${moduleVersion}")
-
-        println(status.unstaged.modified)
+        vcs.pull()
+        vcs.push(remote: "origin", refsOrSpecs: ["refs/tags/${moduleVersion}", "refs/heads/${branchName}"])
     }
 }
 
@@ -315,28 +318,25 @@ task gitCommitPush {
     inputs.file(bumpVersionCfgFile)
 
     doLast {
-        def moduleVersion = getModuleVersion(pythonVersionFile)
         def vcs = grgit.open()
+        def moduleVersion = getModuleVersion(pythonVersionFile)
+        commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Preparing for ${moduleVersion}")
 
-        def modified = vcs.status().unstaged['modified']
-        println(vcs.status().unstaged)
-        inputs.files.forEach {
-            // We make the inputs relative to match modified
-            def path = it.toString().replaceAll("${projectDir}/", "")
-            if (modified.contains(path)) {
-                vcs.add(patterns: [path])
-            }
-        }
-        println(vcs.status().staged)
+        vcs.pull()
+        vcs.push(remote: "origin")
     }
 }
 
-task checkModuleVersion {
+task debugInfo {
     inputs.file(pythonVersionFile)
 
     doLast {
         def moduleVersion = getModuleVersion(pythonVersionFile)
-        println(moduleVersion)
+        println("Current module version: ${moduleVersion}")
+
+        def vcs = grgit.open()
+        def branch = vcs.branch.current().getName()
+        println("Current branch: ${branch}")
     }
 }
 
@@ -388,4 +388,23 @@ static def getModuleVersion(versionFile) {
     }
     def match = versionLine =~ /"(.*)"/
     return match[0][1]
+}
+
+def commitVersionChanges(filesToCommit, commitMessage) {
+    def vcs = grgit.open()
+    def modified = vcs.status().unstaged['modified']
+
+    filesToCommit.forEach {
+        // Ensure inputs are relative project directory to match modified
+        def path = it.toString().replaceAll("${projectDir}/", "")
+        if (modified.contains(path)) {
+            vcs.add(patterns: [path])
+        }
+    }
+    logger.info("Files staged for commit: ${vcs.status().staged['modified']}")
+
+    def commit = vcs.commit(message: commitMessage)
+    logger.info("Commit: ${commit.abbreviatedId}")
+    logger.info("Commit: ${commit.shortMessage}")
+    return commit
 }
