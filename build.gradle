@@ -55,8 +55,6 @@ class PyExtension {
     String flake8      = "${binPath}/flake8"        // Lint the code
     String pytest      = "${binPath}/pytest"        // Used for testing
     
-    String jupyter     = "${binPath}/jupyter"       // For Jupyter notebooks (if used)
-    
     String twine       = "${binPath}/twine"         // Upload/publish to PyPi repos
     String bumpversion = "${binPath}/bumpversion"   // Manage versions
 
@@ -92,7 +90,7 @@ task cleanVenv {
     group "Generated file cleanup"
 
     doFirst {
-        delete py.venv
+        delete "${py.venvRoot}"
     }
 }
 
@@ -145,15 +143,14 @@ task installDependencies {
     }
 }
 
-task installJupyterDependencies  {
-    description "Install the development requirements in the virtual env. Add jupyter based development tools. Optional"
+task installInteractiveDevDependencies  {
+    description "Install the interactive development requirements in the virtual env, e.g. Jupyter."
     group "Python Virtual Environment Management"
 
     dependsOn installDependencies
-    outputs.files([py.jupyter])
 
     doLast {
-        run(py.pip, ["install", "-e", ".[jupyter_group]"])
+        run(py.pip, ["install", "-e", ".[interactive_dev_group]"])
     }
 }
 
@@ -236,9 +233,7 @@ task bumpVersionRelease {
             throw new GradleException(message)
         }
 
-        def bv = bumpTheVersion(["--list", "--allow-dirty", "release"])
-        logger.info("Version changed from snapshot to relase version.")
-        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+        bumpTheVersion(["--list", "--allow-dirty", "release"], "Version changed from snapshot to relase version.")
     }
 }
 
@@ -257,9 +252,7 @@ task bumpVersionDev {
             throw new GradleException(message)
         }
 
-        def bv = bumpTheVersion(["--list", "--allow-dirty", "devbuild"])
-        logger.info("Snapshot dev version bumped.")
-        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+        bumpTheVersion(["--list", "--allow-dirty", "devbuild"], "Snapshot dev version bumped.")
     }
 }
 
@@ -284,9 +277,7 @@ task bumpVersionPostRelease {
             changePart = bumpPartOverride
         }
 
-        def bv = bumpTheVersion(["--list", "--allow-dirty", changePart])
-        logger.info("Version bumped for next round of development.")
-        logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+        bumpTheVersion(["--list", "--allow-dirty", changePart], "Version bumped for next round of development.")
     }
 }
 
@@ -363,7 +354,7 @@ class VersionInfo {
     String newVersion = ""
 }
 
-def bumpTheVersion(bvArgs) {
+def bumpTheVersion(bvArgs, logMessage) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
     exec {
         environment = py.env
@@ -375,6 +366,10 @@ def bumpTheVersion(bvArgs) {
     def info = new VersionInfo()
     info.oldVersion = (output =~ /current_version=(.+)/)[0][1]
     info.newVersion = (output =~ /new_version=(.+)/)[0][1]
+
+    logger.info(logMessage)
+    logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
+
     return info
 }
 
