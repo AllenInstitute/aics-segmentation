@@ -301,8 +301,8 @@ task gitTagCommitPush {
         def vcs = grgit.open()
         def moduleVersion = getModuleVersion(pythonVersionFile)
         def branchName = vcs.branch.current().getName()
-        def commit = commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Published release ${moduleVersion}")
-        vcs.tag.add(name: "${moduleVersion}", message: "Tagged release ${moduleVersion}", pointsTo: commit, annotate: true)
+        def commit = commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Release version ${moduleVersion}")
+        vcs.tag.add(name: "${moduleVersion}", message: "Release version ${moduleVersion}", pointsTo: commit, annotate: true)
         // Now push the committed files and the tag!
 
         vcs.pull()
@@ -320,7 +320,7 @@ task gitCommitPush {
     doLast {
         def vcs = grgit.open()
         def moduleVersion = getModuleVersion(pythonVersionFile)
-        commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Preparing for ${moduleVersion}")
+        commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Next dev version: ${moduleVersion}")
 
         vcs.pull()
         vcs.push(remote: "origin")

@@ -53,16 +53,12 @@ node ("python-gradle")
             }
         }
 
-        stage ("bump version post-build") {
+        stage ("prep for dev") {
             // if after release build: X.Y.Z -> X.Y.Z+1.dev0  (patch)
             // if snapshot build: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
             def bumpTask = create_release ? "bumpVersionPostRelease" : "bumpVersionDev"
             sh "./gradlew -i ${bumpTask}"
-        }
-
-        stage ("push") {
-            def git_task = create_release ? "gitPushWithTag" : "gitPush"
-            sh "./gradlew -i ${git_task}" 
+            sh "./gradlew -i gitCommitPush"
         }
 
         currentBuild.result = "SUCCESS"
