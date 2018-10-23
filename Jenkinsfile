@@ -39,6 +39,8 @@ node ("python-gradle")
             sh './gradlew -i build'
         }
 
+        junit "build/test_report.xml"
+
         stage ("publish") {
             def publish_task = create_release ? "publishRelease" : "publishSnapshot"
             sh "./gradlew -i ${publish_task}"
