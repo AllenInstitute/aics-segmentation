@@ -352,11 +352,6 @@ def run(pyExec, pyArgs) {
     }
 }
 
-class VersionInfo {
-    String oldVersion = ""
-    String newVersion = ""
-}
-
 def bumpTheVersion(bvArgs, logMessage) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
     exec {
@@ -366,14 +361,11 @@ def bumpTheVersion(bvArgs, logMessage) {
         standardOutput = outputStream
     }
     def output = outputStream.toString()
-    def info = new VersionInfo()
-    info.oldVersion = (output =~ /current_version=(.+)/)[0][1]
-    info.newVersion = (output =~ /new_version=(.+)/)[0][1]
+    def oldVersion = (output =~ /current_version=(.+)/)[0][1]
+    def newVersion = (output =~ /new_version=(.+)/)[0][1]
 
     logger.info(logMessage)
-    logger.info("\t${bv.oldVersion} -> ${bv.newVersion}")
-
-    return info
+    logger.info("\t${oldVersion} -> ${newVersion}")
 }
 
 static def getModuleVersion(versionFile) {
