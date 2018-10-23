@@ -334,10 +334,13 @@ task debugInfo {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 def uploadTo(repoAlias) {
+    def localCerts = ["--cert", "/etc/ssl/certs/aics-ca.pem"]
+    def uploadArgs = ["upload", "-r", "${repoAlias}"] + (repoAlias.contains("-local") ? localCerts : []) + ["dist/*.whl"]
+    println("Upload Args: ${uploadArgs}")
     exec {
         environment = py.env
         executable = py.twine
-        args = ["upload", "-r", "${repoAlias}", "dist/*.whl"]
+        args = uploadArgs
     }
 }
 
