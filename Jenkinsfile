@@ -8,7 +8,7 @@ node ("python-gradle")
     def create_release=(params.create_release)
     echo "BUILDTYPE: " + (create_release ? "Creating a Release" : "Building a Snapshot")
 
-    if (gitAuthor() != "jenkins") {
+//    if (gitAuthor() != "jenkins") {
         try {
             stage ("git pull") {
                 def git_url=gitUrl()
@@ -79,7 +79,7 @@ node ("python-gradle")
                 recipients: '!AICS_DevOps@alleninstitute.org',
                 sendToIndividuals: true])
         }
-    }
+//    }
 }
 
 def gitUrl() {
