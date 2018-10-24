@@ -296,7 +296,7 @@ task gitTagCommitPush {
         vcs.tag.add(name: "${moduleVersion}", message: "Release version ${moduleVersion}", pointsTo: commit, annotate: true)
         // Now push the committed files and the tag!
 
-        vcs.pull()
+//        vcs.pull()
         vcs.push(remote: "origin", refsOrSpecs: ["refs/tags/${moduleVersion}", "refs/heads/${branchName}"])
     }
 }
@@ -313,8 +313,8 @@ task gitCommitPush {
         def moduleVersion = getModuleVersion(pythonVersionFile)
         commitVersionChanges([pythonVersionFile, bumpVersionCfgFile], "Next dev version: ${moduleVersion}")
 
-        logger.info("Pulling from master to ensure workspace is upto date")
-        vcs.pull()
+        // logger.info("Pulling from master to ensure workspace is upto date")
+        // vcs.pull()
         logger.info("Pushing changes to master")
         vcs.push(remote: "origin")
         logger.info("Push complete")
