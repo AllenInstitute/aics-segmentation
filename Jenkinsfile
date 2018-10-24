@@ -2,9 +2,6 @@
 
 node ("python-gradle")
 {
-    // parameters { booleanParam(name: 'promote_artifact', defaultValue: false, description: '') }
-    // def is_promote=(params.promote_artifact)
-    // echo "BUILDTYPE: " + (is_promote ? "Promote Image" : "Build, Publish and Tag")
     parameters { booleanParam(name: 'create_release', defaultValue: false, 
                               description: 'If true, create a release artifact and publish to ' +
                                            'the artifactory release PyPi or public PyPi.') }
