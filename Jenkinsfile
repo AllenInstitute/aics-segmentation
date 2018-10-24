@@ -12,7 +12,7 @@ node ("python-gradle")
         stage ("git pull") {
             def git_url=gitUrl()
             if (env.BRANCH_NAME == null) {
-                git url: "${git_url}", branch "master"
+                git url: "${git_url}", branch: "master"
             }
             else {
                 println "*** BRANCH ${env.BRANCH_NAME}"
