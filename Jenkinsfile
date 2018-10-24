@@ -48,7 +48,7 @@ node ("python-gradle")
                 sh "./gradlew -i gitTagCommitPush"
             }
             else {
-                prinln "No tags: this is a dev build."
+                println "No tags: this is a dev build."
             }
         }
 
