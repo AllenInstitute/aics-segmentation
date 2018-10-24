@@ -2,6 +2,16 @@
 
 node ("python-gradle")
 {
+    checkout([$class: 'GitSCM', 
+        branches: [[name: '*/master']], 
+        doGenerateSubmoduleConfigurations: false, 
+        extensions: scm.extensions + [
+            [$class: 'CleanCheckout'],
+            [$class: 'UserExclusion', excludedUsers: 'jenkins']
+        ],
+        
+    ])
+
     parameters { booleanParam(name: 'create_release', defaultValue: false, 
                               description: 'If true, create a release artifact and publish to ' +
                                            'the artifactory release PyPi or public PyPi.') }
