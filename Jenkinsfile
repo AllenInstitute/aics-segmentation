@@ -54,14 +54,14 @@ node ("python-gradle")
 
         stage ("prep for dev") {
             if (create_release) {
-                // Update patch by default after a release: X.Y.Z -> X.Y.Z+1.dev0  (patch)
+                // X.Y.Z -> X.Y.Z+1.dev0  (default - increment patch)
                 sh "./gradlew -i bumpVersionPostRelease"
                 sh "./gradlew -i gitCommitPush"
             }
-            else {
-                // Update dev: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
+            else {  // This is a snapshot build
+                // X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
                 def ignoreAuthors = ["jenkins", "Jenkins User", "Jenkins Builder"]
-                if (!ignoreAuthors.contains(gitAuthor()) {
+                if (!ignoreAuthors.contains(gitAuthor())) {
                     sh "./gradlew -i bumpVersionDev"
                     sh "./gradlew -i gitCommitPush"
                 }
