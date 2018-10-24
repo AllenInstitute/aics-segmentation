@@ -2,94 +2,93 @@
 
 node ("python-gradle")
 {
-    checkout([$class: 'GitSCM', 
-        branches: [[name: '*/master']], 
-        doGenerateSubmoduleConfigurations: false, 
-        extensions: scm.extensions + [
-            [$class: 'CleanCheckout'],
-            [$class: 'UserExclusion', excludedUsers: 'jenkins']
-        ],
-        
-    ])
-
     parameters { booleanParam(name: 'create_release', defaultValue: false, 
                               description: 'If true, create a release artifact and publish to ' +
                                            'the artifactory release PyPi or public PyPi.') }
     def create_release=(params.create_release)
     echo "BUILDTYPE: " + (create_release ? "Creating a Release" : "Building a Snapshot")
 
-//    if (gitAuthor() != "jenkins") {
-        try {
-            stage ("git pull") {
-                def git_url=gitUrl()
-                if (env.BRANCH_NAME == null) {
-                    git url: "${git_url}"
-                }
-                else {
-                    println "*** BRANCH ${env.BRANCH_NAME}"
-                    git url: "${git_url}", branch: "${env.BRANCH_NAME}"
-                }
+    try {
+        stage ("git pull") {
+            def git_url=gitUrl()
+            if (env.BRANCH_NAME == null) {
+                git url: "${git_url}"
             }
-
-            stage ("initialize virtualenv") {
-                sh "./gradlew -i cleanAll installCIDependencies"
+            else {
+                println "*** BRANCH ${env.BRANCH_NAME}"
+                git url: "${git_url}", branch: "${env.BRANCH_NAME}"
             }
+        }
 
-            stage ("bump version pre-build") {
-                // This will drop the dev suffix if we are releasing
-                if (create_release) {
-                    // X.Y.Z.devN -> X.Y.Z
-                    sh "./gradlew -i bumpVersionRelease"
-                }
+        stage ("initialize virtualenv") {
+            sh "./gradlew -i cleanAll installCIDependencies"
+        }
+
+        stage ("bump version pre-build") {
+            // This will drop the dev suffix if we are releasing
+            if (create_release) {
+                // X.Y.Z.devN -> X.Y.Z
+                sh "./gradlew -i bumpVersionRelease"
             }
+        }
 
-            stage ("test/build distribution") {
-                sh './gradlew -i build'
+        stage ("test/build distribution") {
+            sh './gradlew -i build'
+        }
+
+        junit "build/test_report.xml"
+
+        stage ("publish") {
+            def publish_task = create_release ? "publishRelease" : "publishSnapshot"
+            sh "./gradlew -i ${publish_task}"
+        }
+
+        stage ("tag release") {
+            if (create_release) {
+                sh "./gradlew -i gitTagCommitPush"
             }
-
-            junit "build/test_report.xml"
-
-            stage ("publish") {
-                def publish_task = create_release ? "publishRelease" : "publishSnapshot"
-                sh "./gradlew -i ${publish_task}"
+            else {
+                prinln "No tags: this is a dev build."
             }
+        }
 
-            stage ("tag release") {
-                if (create_release) {
-                    sh "./gradlew -i gitTagCommitPush"
-                }
-            }
-
-            stage ("prep for dev") {
-                // if after release build: X.Y.Z -> X.Y.Z+1.dev0  (patch)
-                // if snapshot build: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
-                def bumpTask = create_release ? "bumpVersionPostRelease" : "bumpVersionDev"
-                sh "./gradlew -i ${bumpTask}"
+        stage ("prep for dev") {
+            if (create_release) {
+                // Update patch by default after a release: X.Y.Z -> X.Y.Z+1.dev0  (patch)
+                sh "./gradlew -i bumpVersionPostRelease"
                 sh "./gradlew -i gitCommitPush"
             }
-
-            currentBuild.result = "SUCCESS"
-        }
-        catch(e) {
-            // If there was an exception thrown, the build failed
-            currentBuild.result = "FAILURE"
-            throw e
-        }
-        finally {
-
-            if (currentBuild?.result) {
-                println "BUILD: ${currentBuild.result}"
+            else {
+                // Update dev: X.Y.Z.devN -> X.Y.Z.devN+1  (devbuild)
+                def ignoreAuthors = ["jenkins", "Jenkins User", "Jenkins Builder"]
+                if (!ignoreAuthors.contains(gitAuthor()) {
+                    sh "./gradlew -i bumpVersionDev"
+                    sh "./gradlew -i gitCommitPush"
+                }
             }
-            // Slack
-            notifyBuildOnSlack(currentBuild.result, currentBuild.previousBuild?.result)
-
-            // Email
-            step([$class: 'Mailer',
-                notifyEveryUnstableBuild: true,
-                recipients: '!AICS_DevOps@alleninstitute.org',
-                sendToIndividuals: true])
         }
-//    }
+
+        currentBuild.result = "SUCCESS"
+    }
+    catch(e) {
+        // If there was an exception thrown, the build failed
+        currentBuild.result = "FAILURE"
+        throw e
+    }
+    finally {
+
+        if (currentBuild?.result) {
+            println "BUILD: ${currentBuild.result}"
+        }
+        // Slack
+        notifyBuildOnSlack(currentBuild.result, currentBuild.previousBuild?.result)
+
+        // Email
+        step([$class: 'Mailer',
+            notifyEveryUnstableBuild: true,
+            recipients: '!AICS_DevOps@alleninstitute.org',
+            sendToIndividuals: true])
+    }
 }
 
 def gitUrl() {
