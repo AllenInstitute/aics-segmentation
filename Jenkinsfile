@@ -48,7 +48,7 @@ node ("python-gradle")
                 sh "./gradlew -i gitTagCommitPush"
             }
             else {
-                println "No tags: this is a dev build."
+                println "This is a snapshot build - it will not be tagged."
             }
         }
 
@@ -62,6 +62,9 @@ node ("python-gradle")
                 def ignoreAuthors = ["jenkins", "Jenkins User", "Jenkins Builder"]
                 if (!ignoreAuthors.contains(gitAuthor())) {
                     sh "./gradlew -i bumpVersionDev gitCommitPush"
+                }
+                else {
+                    println "This is a snapshot build from a jenkins commit. The version will not be bumped."
                 }
             }
         }
