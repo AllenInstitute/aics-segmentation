@@ -27,7 +27,7 @@ STRUCTURE_MAPPING = {
     'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},  # version 1.2.0
     'TUBA1B': {'module': 'aicssegmentation.structure_wrapper.seg_tuba1b', 'class': 'TUBA1B_HiPSC_Pipeline'}, # version 1.1.2
     'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},  # version 1.1.2
-    'CENT2': {'module': 'aicssegmentation.structure_wrapper.seg_cent2', 'class': 'CENT2_HiPSC_Pipeline'},  # version 1.1.0
+    'CETN2': {'module': 'aicssegmentation.structure_wrapper.seg_cetn2', 'class': 'CETN2_HiPSC_Pipeline'},  # version 1.1.0
     'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},       # version 1.1.3
     'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'}, # version 1.1.3
     #### more structures
