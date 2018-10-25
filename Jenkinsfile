@@ -90,12 +90,12 @@ node ("python-gradle")
 }
 
 def gitUrl() {
-    checkout scm
+    //checkout scm
     sh(returnStdout: true, script: 'git config remote.origin.url').trim()
 }
 
 def gitAuthor() {
-    checkout scm
+    //checkout scm
     sh(returnStdout: true, script: 'git log -1 --format=%an').trim()
 }
 
