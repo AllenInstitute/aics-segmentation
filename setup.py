@@ -55,7 +55,8 @@ setup(name=PACKAGE_NAME,
           'pandas>=0.23.4',
           'aicsimageio>=0.4.3',
           'aicsimageprocessing',
-          'numba>=0.40.0'
+          'numba>=0.40.0',
+          'itk'
       ],
 
       # For test setup. This will allow JUnit XML output for Jenkins
