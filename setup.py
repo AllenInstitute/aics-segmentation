@@ -20,7 +20,7 @@ def readme():
         return f.read()
 
 
-test_deps = ['pytest']
+test_deps = ['pytest', 'pytest-cov']
 lint_deps = ['flake8']
 interactive_dev_deps = [
     'matplotlib>=2.2.3',
