@@ -4,12 +4,12 @@ from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_3d
 from ..core.vessel import vesselness3D
-from skimage.feature import peak_local_max
-from scipy.ndimage import distance_transform_edt
-from skimage.measure import label
+# from skimage.feature import peak_local_max
+# from scipy.ndimage import distance_transform_edt
+# from skimage.measure import label
 
 
-def ACTB_HiPSC_Pipeline(struct_img,rescale_ratio):
+def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
@@ -32,7 +32,7 @@ def ACTB_HiPSC_Pipeline(struct_img,rescale_ratio):
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
     
     # rescale if needed
-    if rescale_ratio>0:
+    if rescale_ratio > 0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio

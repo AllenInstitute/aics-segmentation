@@ -8,7 +8,7 @@ from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
 
 
-def CENT2_HiPSC_Pipeline(struct_img,rescale_ratio):
+def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

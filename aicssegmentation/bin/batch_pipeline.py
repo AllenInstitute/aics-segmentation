@@ -9,9 +9,7 @@ import traceback
 import importlib
 import pathlib
 
-from argparse import ArgumentParser
 import aicsimageio
-import aicsimageprocessing
 from aicssegmentation.core.utils import save_segmentation
 
 
@@ -21,27 +19,27 @@ PER_IMAGE = 'per_img'
 PER_DIR = 'per_dir'
 
 STRUCTURE_MAPPING = {
-    ### tentative list of structures to be updated in Dec release
-    'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},
-    'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},
-    'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},
-    'TUBA1B': {'module': 'aicssegmentation.structure_wrapper.seg_tuba1b', 'class': 'TUBA1B_HiPSC_Pipeline'},
-    'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},
-    'CENT2': {'module': 'aicssegmentation.structure_wrapper.seg_cent2', 'class': 'CENT2_HiPSC_Pipeline'},
-    #### more structures
-    'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},
+    # ### final list of 8 structures to be updated in Dec release
+    'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},             # version 1.1.1
+    'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},    # version 1.1.2
+    'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},  # version 1.2.0
+    'TUBA1B': {'module': 'aicssegmentation.structure_wrapper.seg_tuba1b', 'class': 'TUBA1B_HiPSC_Pipeline'},    # version 1.1.2
+    'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},    # version 1.1.2
+    'CETN2': {'module': 'aicssegmentation.structure_wrapper.seg_cetn2', 'class': 'CETN2_HiPSC_Pipeline'},   # version 1.1.0
+    'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},         # version 1.1.3
+    'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},   # version 1.1.3
+    # ### more structures
     'TJP1': {'module': 'aicssegmentation.structure_wrapper.seg_tjp1', 'class': 'TJP1_HiPSC_Pipeline'},
     'ACTB': {'module': 'aicssegmentation.structure_wrapper.seg_actb', 'class': 'ACTB_HiPSC_Pipeline'},
     'MYH10': {'module': 'aicssegmentation.structure_wrapper.seg_myh10', 'class': 'MYH10_HiPSC_Pipeline'},
     'CTNNB1': {'module': 'aicssegmentation.structure_wrapper.seg_ctnnb1', 'class': 'CTNNB1_HiPSC_Pipeline'},
     'GJA1': {'module': 'aicssegmentation.structure_wrapper.seg_gja1', 'class': 'GJA1_HiPSC_Pipeline'},
-    'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},
     'NPM1': {'module': 'aicssegmentation.structure_wrapper.seg_npm1', 'class': 'NPM1_HiPSC_Pipeline'},
     'LAMP1': {'module': 'aicssegmentation.structure_wrapper.seg_lamp1', 'class': 'LAMP1_HiPSC_Pipeline'},
     'RAB5A': {'module': 'aicssegmentation.structure_wrapper.seg_rab5a', 'class': 'RAB5A_HiPSC_Pipeline'},
     'SLC25A17': {'module': 'aicssegmentation.structure_wrapper.seg_slc25a17', 'class': 'SLC25A17_HiPSC_Pipeline'},
     'TNNI1_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_tnni1', 'class': 'TNNI1_Cardio_Pipeline'},
-    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'},
+    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'}
 }
 
 
@@ -89,10 +87,10 @@ class Args(object):
     @staticmethod
     def __no_args_print_help(parser):
         """
-        This is used to print out the help if no arguments are provided. 
+        This is used to print out the help if no arguments are provided.
         Note:
         - You need to remove it's usage if your script truly doesn't want arguments.
-        - It exits with 1 because it's an error if this is used in a script with no args. 
+        - It exits with 1 because it's an error if this is used in a script with no args.
           That's a non-interactive use scenario - typically you don't want help there.
         """
         if len(sys.argv) == 1:
@@ -115,21 +113,18 @@ class Args(object):
         p.add_argument('--contour', dest='save_contour', action='store_true',
                        help='save contour plot or not')
 
-
         subparsers = p.add_subparsers(dest='mode')
         subparsers.required = True
-        
+
         parser_img = subparsers.add_parser(PER_IMAGE)
         parser_img.add_argument('--input',  dest='input_fname',
-                       help='input filename')
-        
+                                help='input filename')
 
         parser_dir = subparsers.add_parser(PER_DIR)
         parser_dir.add_argument('--input_dir',  dest='input_dir',
-                       help='input directory')
+                                help='input directory')
         parser_dir.add_argument('--data_type',  default='.czi', dest='data_type',
-                       help='the image type to be processed, e.g., .czi (default) or .tiff or .ome.tif')
-
+                                help='the image type to be processed, e.g., .czi (default) or .tiff or .ome.tif')
 
         self.__no_args_print_help(p)
         p.parse_args(namespace=self)
@@ -168,7 +163,7 @@ class Executor(object):
     def execute(self, args):
 
         if args.struct_name not in STRUCTURE_MAPPING.keys():
-            print('{} structure not found'.format(args.struct_name)) 
+            print('{} structure not found'.format(args.struct_name))
             sys.exit(1)
         # Pull module info for this structure
         seg_module_info = STRUCTURE_MAPPING[args.struct_name]
@@ -181,34 +176,34 @@ class Executor(object):
 
         ##########################################################################
         if args.mode == PER_IMAGE:
-            
+
             fname = os.path.basename(os.path.splitext(args.input_fname)[0])
 
             image_reader = aicsimageio.AICSImage(args.input_fname)
             img = image_reader.data
-            struct_img = img[0, args.struct_ch,:,:,:].astype(np.float32)
+            struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
 
             bw = SegModule(struct_img, self.rescale_ratio)
-          
+
             save_segmentation(bw, args.save_contour, output_path, fname)
 
         elif args.mode == PER_DIR:
 
             filenames = [os.path.basename(os.path.splitext(f)[0])
-                for f in os.listdir(args.input_dir) if f.endswith(args.data_type)]
+                         for f in os.listdir(args.input_dir)
+                         if f.endswith(args.data_type)]
             filenames.sort()
 
             for fi, fn in enumerate(filenames):
 
                 image_reader = aicsimageio.AICSImage(os.path.join(args.input_dir, f'{fn}{args.data_type}'))
                 img = image_reader.data
-                struct_img = img[0, args.struct_ch,:,:,:].astype(np.float32)
+                struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
 
                 bw = SegModule(struct_img, self.rescale_ratio)
 
                 save_segmentation(bw, args.save_contour, output_path, fn)
 
-           
 ###############################################################################
 
 

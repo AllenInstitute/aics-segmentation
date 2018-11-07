@@ -11,13 +11,11 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [3, 15]  
+    intensity_norm_param = [100, 12]  
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    vesselness_sigma_1 = [1]
-    vesselness_cutoff_1 = 0.2
-    vesselness_sigma_2 = [0.25]
-    vesselness_cutoff_2 = 0.05
+    vesselness_sigma = [1,2]
+    vesselness_cutoff = 0.05
     minArea = 5
     ##########################################################################
 
@@ -41,9 +39,8 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
     ###################
 
     # vesselness 3d 
-    response_1 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_1,  tau=1, whiteonblack=True)
-    response_2 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_2,  tau=1, whiteonblack=True)
-    bw = np.logical_or(response_1 > vesselness_cutoff_1, response_2 > vesselness_cutoff_2) 
+    response = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
+    bw = response > vesselness_cutoff
     
     ###################
     # POST-PROCESSING

@@ -3,6 +3,7 @@ import copy
 from .utils import divide_nonzero
 from .hessian import absolute_3d_hessian_eigenvalues
 
+
 def blobness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblack=True):
 
     if not nd_array.ndim == 3:
@@ -19,11 +20,12 @@ def blobness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblac
 
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
-        #print(eigenvalues[1])
-        #print(eigenvalues[2])
-        filtered_array[i] = compute_blobness3D(eigenvalues[0],eigenvalues[1],eigenvalues[2], tau = tau)
+        # print(eigenvalues[1])
+        # print(eigenvalues[2])
+        filtered_array[i] = compute_blobness3D(eigenvalues[0], eigenvalues[1], eigenvalues[2], tau=tau)
 
     return np.max(filtered_array, axis=0)
+
 
 def vesselness3D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
@@ -38,29 +40,30 @@ def vesselness3D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
-        #print(eigenvalues[1])
-        #print(eigenvalues[2])
-        filtered_array[i] = compute_vesselness3D(eigenvalues[1],eigenvalues[2], tau = tau)
+        # print(eigenvalues[1])
+        # print(eigenvalues[2])
+        filtered_array[i] = compute_vesselness3D(eigenvalues[1], eigenvalues[2], tau=tau)
 
     return np.max(filtered_array, axis=0)
+
 
 def plateness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, pa=0.5, pb=0.5, pc=1, whiteonblack=True):
     if not nd_array.ndim == 3:
         raise(ValueError("Only 3 dimensions is currently supported"))
-        
+
     sigmas = np.arange(scale_range[0], scale_range[1], scale_step)
     if np.any(np.asarray(sigmas) < 0.0):
         raise ValueError("Sigma values less than zero are not valid")
-        
+
     print(sigmas)
-    
-    
+
     filtered_array = np.zeros(sigmas.shape + nd_array.shape)
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
-        filtered_array[i] = compute_plateness3D(eigenvalues[0],eigenvalues[1],eigenvalues[2],pa,pb,pc, tau = tau)
-        
+        filtered_array[i] = compute_plateness3D(eigenvalues[0], eigenvalues[1], eigenvalues[2], pa, pb, pc, tau=tau)
+
     return np.max(filtered_array, axis=0)
+
 
 def vesselness2D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
@@ -71,47 +74,50 @@ def vesselness2D(nd_array, sigmas, tau=0.5, whiteonblack=True):
     if np.any(np.asarray(sigmas) < 0.0):
         raise ValueError("Sigma values less than zero are not valid")
 
-    filtered_array = np.zeros(tuple([len(sigmas),]) + nd_array.shape)
+    filtered_array = np.zeros(tuple([len(sigmas), ]) + nd_array.shape)
 
     for i, sigma in enumerate(sigmas):
         eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
-        #print(eigenvalues[1])
-        #print(eigenvalues[2])
-        filtered_array[i] = compute_vesselness2D(eigenvalues[1], tau = tau)
+        # print(eigenvalues[1])
+        # print(eigenvalues[2])
+        filtered_array[i] = compute_vesselness2D(eigenvalues[1], tau=tau)
 
     return np.max(filtered_array, axis=0)
 
+
 def vesselnessSliceBySlice(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
-    mip= np.amax(nd_array,axis=0)
+    mip = np.amax(nd_array, axis=0)
     response = np.zeros(nd_array.shape)
     for zz in range(nd_array.shape[0]):
-        tmp = np.concatenate((nd_array[zz,:,:],mip),axis=1)
+        tmp = np.concatenate((nd_array[zz, :, :], mip), axis=1)
         tmp = vesselness2D(tmp,  sigmas=sigmas, tau=1, whiteonblack=True)
-        response[zz,:,:nd_array.shape[2]-3] = tmp[:,:nd_array.shape[2]-3]
+        response[zz, :, :nd_array.shape[2]-3] = tmp[:, :nd_array.shape[2]-3]
 
     return response
+
 
 def compute_blobness3D(eigen1, eigen2, eigen3, tau):
 
     lambda3m = copy.copy(eigen3)
-    lambda3m[eigen3>(tau*eigen3.min())]=tau*eigen3.min()
+    lambda3m[eigen3 > (tau*eigen3.min())] = tau*eigen3.min()
 
     response = np.multiply(np.square(eigen1), lambda3m)
-    response = divide_nonzero(27*response, np.power(2*eigen1+lambda3m,3))
+    response = divide_nonzero(27*response, np.power(2*eigen1 + lambda3m, 3))
     
-    response[np.less(np.abs(lambda3m),np.abs(eigen1))]=1
-    response[eigen1>=0]=0
-    response[eigen2>=0]=0
-    response[eigen3>=0]=0
-    response[np.isinf(response)]=0
+    response[np.less(np.abs(lambda3m), np.abs(eigen1))] = 1
+    response[eigen1 >= 0] = 0
+    response[eigen2 >= 0] = 0
+    response[eigen3 >= 0] = 0
+    response[np.isinf(response)] = 0
 
     return response
+
 
 def compute_vesselness3D(eigen2, eigen3, tau):
 
     lambda3m = copy.copy(eigen3)
-    lambda3m[np.logical_and(eigen3<0, eigen3>(tau*eigen3.min()))]=tau*eigen3.min()
+    lambda3m[np.logical_and(eigen3 < 0, eigen3 > (tau*eigen3.min()))]=tau*eigen3.min()
     response = np.multiply(np.square(eigen2),np.abs(lambda3m-eigen2))
     response = divide_nonzero(27*response, np.power(2*np.abs(eigen2)+np.abs(lambda3m-eigen2),3))
 

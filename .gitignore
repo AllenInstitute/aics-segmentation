@@ -14,4 +14,7 @@ venv/
 .eggs/
 *.egg-info
 **/__pycache__/
+.pyc
 .pytest_cache/
+activate
+.coverage
