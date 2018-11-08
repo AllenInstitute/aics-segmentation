@@ -30,11 +30,17 @@ in all, we developed a new open-source toolkit for 3D microscopy image segmentat
 leveraging state-of-the-art computer vision algorithms in an accessible way and hope 
 to facilitate cell biologists to gain more insight into fundamental biological questions.
 
+
+# Installation 
+
+Out package is implemented in python 3.6. We suggest to manage your python packages using conda. For detailed instruction on different operating system, check the pages below.
+
+[Installation on Windows](./docs/installation_windows.md)
+
+
 ## Level of Support
 We are not currently supporting this code for external use, but simply releasing it 
 to the community AS IS. It is used for within our organization. We are not able to 
 provide any guarantees of support. The community is welcome to submit issues, but 
 you should not expect an active response.
 
-## Development
-See [BUILD.md](BUILD.md) for information operations related to developing the code.
