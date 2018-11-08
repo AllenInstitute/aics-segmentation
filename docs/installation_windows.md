@@ -13,32 +13,32 @@ Note: Depending on the time you access this page, you may be directed to the dow
 
 [What is conda and anaconda, and why we need this?](conda_why.md) In short, setting up conda will make all the following setups straightforward and greatly avoid future problems (conda itself is also very easy to set up).
 
-1. [Install conda on Windows](https://conda.io/docs/user-guide/install/windows.html?highlight=conda), choose anaconda installer.
+#### 1. [Install conda on Windows](https://conda.io/docs/user-guide/install/windows.html?highlight=conda), choose anaconda installer.
 
 
-2. [Start conda on Windows](https://conda.io/docs/user-guide/getting-started.html#starting-conda)
+#### 2. [Start conda on Windows](https://conda.io/docs/user-guide/getting-started.html#starting-conda)
 
 All commands below are typed into Anaconda Prompt window
 
-3. Create a new empty conda environment (suppose we use name "segmentation" for this environment)
+#### 3. Create a new empty conda environment (suppose we use name "segmentation" for this environment)
 
 ``` bash 
 conda create -n segmentation python=3.6
 ```
 
-4. Activate your new conda environment "segmentation"
+#### 4. Activate your new conda environment "segmentation"
 
 ``` bash
 activate segmentation
 ```
 
-5. Now, you are in "segmentation" environment. You can install the package following the steps below.
+#### 5. Now, you are in "segmentation" environment. You can install the package following the steps below.
 
 
 ## Step 3: Clone the github repository 
 
 
-1. Check if you have git installed.
+#### 1. Check if you have git installed.
 
 ```bash 
 git --version
@@ -46,7 +46,7 @@ git --version
 
 If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install.
 
-2. Clone aics-segmentation repository from Github (suppose you want to save the folder under 'C:\Projects')
+#### 2. Clone aics-segmentation repository from Github (suppose you want to save the folder under 'C:\Projects')
 
 ```bash
 cd C:\Projects
