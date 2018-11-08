@@ -35,8 +35,11 @@ to facilitate cell biologists to gain more insight into fundamental biological q
 
 Out package is implemented in python 3.6. We suggest to manage your python packages using conda. For detailed instruction on different operating system, check the pages below.
 
-[Installation on Windows](./docs/installation_windows.md)
+[Installation on Linux](./docs/installation_linux.md) (The OS we used for development is Ubuntu 16.04.5 LTS)
 
+[Installation on MacOS](./docs/installation_mac.md)
+
+[Installation on Windows](./docs/installation_windows.md)
 
 ## Level of Support
 We are not currently supporting this code for external use, but simply releasing it 
