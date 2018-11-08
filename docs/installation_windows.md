@@ -11,7 +11,7 @@ Note: Depending on the time you access this page, you may be directed to the dow
 
 ## Step 2: Setup conda environment 
 
-[What is conda and anaconda, and why we need this?](conda_why.md)
+[What is conda and anaconda, and why we need this?](conda_why.md) In short, setting up conda will make all the following setups straightforward and greatly avoid future problems (conda itself is also very easy to set up).
 
 1. [Install conda on Windows](https://conda.io/docs/user-guide/install/windows.html?highlight=conda), choose anaconda installer.
 
@@ -32,7 +32,7 @@ conda create -n segmentation python=3.6
 activate segmentation
 ```
 
-5. Now, you are in "segmentatin" environment. You can install the package following the steps below.
+5. Now, you are in "segmentation" environment. You can install the package following the steps below.
 
 
 ## Step 3: Clone the github repository 
@@ -44,7 +44,7 @@ activate segmentation
 git --version
 ```
 
-If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows)
+If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install.
 
 2. Clone aics-segmentation repository from Github (suppose you want to save the folder under 'C:\Projects')
 
@@ -56,7 +56,7 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 ## Step 4: Install the package
 
 
-### Option 1: Install from PyPi (simple)
+### Option 1: Install from PyPi (simple and recommend for most users)
 
 ```bash
 pip install aicssegmentation
@@ -68,7 +68,7 @@ cd C:\Projects\aics-segmentation\
 pip install -e .
 ```
 
-## Step 4: Test jupyter notebook demo
+## Step 5: Test jupyter notebook demo
 
 
 ``` bash 
