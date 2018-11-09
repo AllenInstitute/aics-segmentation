@@ -34,7 +34,7 @@ In short, we provide a quick start guide below based on concept of ["lookup tabl
 
 ### Quick Start 
 
-[Link](./docs/jupyter_llokup_table.md)
+[Link](./docs/jupyter_lookup_table.md)
 
 ### Full documentation 
 
