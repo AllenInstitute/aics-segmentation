@@ -24,21 +24,21 @@ Our package is implemented in python 3.6. We suggest to manage python packages u
 
 What you just installed is actually a collection of many many image analysis and visualization algorithms implemented in Python 3, including [ITK](https://itkpythonpackage.readthedocs.io/en/latest/), [scikit-image](http://scikit-image.org/docs/stable/), and also some our own implementations. In other words, you already have a huge box of "weapons" for image analysis and visualization in Python on your machine. :hammer: :wrench:
 
-The way we design this toolkit is 
+This toolkit is 
 1. formulated as a simple 3-step workflow for solving 3D intracelluar structure segmentation problem using restricted number of selectable algorithms and tunable parameters
 2. accompanied by a ["lookup table"](./docs/figure_3_lookup_table_20181029.pdf) with 21 representative structures and their results for you as a reference and a starting point.
 
-In short, we provide a quick start guide below based on concept of ["lookup table"] (./docs/figure_3_lookup_table_20181029.pdf) and also full documentations when more details or more advanced development are needed.
+In short, we provide a quick start guide below based on concept of ["lookup table"](./docs/figure_3_lookup_table_20181029.pdf) and also full documentations when more details or more advanced development are needed.
 
 
 
 ### Quick Start 
 
-[Link](jupyter_llokup_table.md)
+[Link](./docs/jupyter_llokup_table.md)
 
 ### Full documentation 
 
-[Link](full_doc.md)
+[Link](./docs/full_doc.md)
 
 ## Level of Support
 We are not currently supporting this code for external use, but simply releasing it 
