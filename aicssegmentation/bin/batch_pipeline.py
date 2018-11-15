@@ -10,7 +10,6 @@ import importlib
 import pathlib
 
 import aicsimageio
-from aicssegmentation.core.utils import save_segmentation
 
 
 ###############################################################################
@@ -19,7 +18,6 @@ PER_IMAGE = 'per_img'
 PER_DIR = 'per_dir'
 
 STRUCTURE_MAPPING = {
-    # ### final list of 8 structures to be updated in Dec release
     'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},             # version 1.1.1
     'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},    # version 1.1.2
     'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},  # version 1.2.0
@@ -27,8 +25,7 @@ STRUCTURE_MAPPING = {
     'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},    # version 1.1.2
     'CETN2': {'module': 'aicssegmentation.structure_wrapper.seg_cetn2', 'class': 'CETN2_HiPSC_Pipeline'},   # version 1.1.0
     'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},         # version 1.1.3
-    'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},   # version 1.1.3
-    # ### more structures
+    'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},   # version 1.1.3  
     'TJP1': {'module': 'aicssegmentation.structure_wrapper.seg_tjp1', 'class': 'TJP1_HiPSC_Pipeline'},
     'ACTB': {'module': 'aicssegmentation.structure_wrapper.seg_actb', 'class': 'ACTB_HiPSC_Pipeline'},
     'MYH10': {'module': 'aicssegmentation.structure_wrapper.seg_myh10', 'class': 'MYH10_HiPSC_Pipeline'},
@@ -39,7 +36,10 @@ STRUCTURE_MAPPING = {
     'RAB5A': {'module': 'aicssegmentation.structure_wrapper.seg_rab5a', 'class': 'RAB5A_HiPSC_Pipeline'},
     'SLC25A17': {'module': 'aicssegmentation.structure_wrapper.seg_slc25a17', 'class': 'SLC25A17_HiPSC_Pipeline'},
     'TNNI1_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_tnni1', 'class': 'TNNI1_Cardio_Pipeline'},
-    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'}
+    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'},
+    'ATP2A2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_atp2a2', 'class': 'ATP2A2_Cardio_Pipeline'},
+    'MYL7_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_myl7', 'class': 'MYL7_Cardio_Pipeline'},
+    'ACTN2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_actn2', 'class': 'ACTN2_Cardio_Pipeline'}
 }
 
 
@@ -110,8 +110,8 @@ class Args(object):
                        help='the xy resolution of the image, default is 0.108')
         p.add_argument('--output_dir', dest='output_dir',
                        help='output directory')
-        p.add_argument('--contour', dest='save_contour', action='store_true',
-                       help='save contour plot or not')
+        p.add_argument('--use', dest='output_type', default='default', 
+                        help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
 
         subparsers = p.add_subparsers(dest='mode')
         subparsers.required = True
@@ -183,9 +183,7 @@ class Executor(object):
             img = image_reader.data
             struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
 
-            bw = SegModule(struct_img, self.rescale_ratio)
-
-            save_segmentation(bw, args.save_contour, output_path, fname)
+            SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fname)
 
         elif args.mode == PER_DIR:
 
@@ -200,9 +198,7 @@ class Executor(object):
                 img = image_reader.data
                 struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
 
-                bw = SegModule(struct_img, self.rescale_ratio)
-
-                save_segmentation(bw, args.save_contour, output_path, fn)
+                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
 
 ###############################################################################
 

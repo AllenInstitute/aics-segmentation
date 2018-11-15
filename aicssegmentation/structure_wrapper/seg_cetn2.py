@@ -6,9 +6,10 @@ from ..core.seg_dot import dot_3d
 from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
+from aicssegmentation.core.output_utils import save_segmentation, CETN2_output
 
 
-def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
+def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
@@ -22,11 +23,17 @@ def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
     minArea = 3
     ##########################################################################
 
+    out_img_list = []
+    out_name_list = []
+
     ###################
     # PRE_PROCESSING
     ###################
     # intenisty normalization (min/max)
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
+
+    out_img_list.append(struct_img.copy())
+    out_name_list.append('im_norm')
     
     # rescale if needed
     if rescale_ratio>0:
@@ -37,6 +44,9 @@ def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
     # smoothing with gaussian filter
     structure_img_smooth = image_smoothing_gaussian_slice_by_slice(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
+    out_img_list.append(structure_img_smooth.copy())
+    out_name_list.append('im_smooth')
+
     ###################
     # core algorithm
     ###################
@@ -46,8 +56,15 @@ def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
     bw = response > dot_3d_cutoff
     bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
+    out_img_list.append(bw.copy())
+    out_name_list.append('interm_mask')
+
     # step 2: 'local_maxi + watershed' for cell cutting
     local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=2, indices=False)
+
+    out_img_list.append(local_maxi.copy())
+    out_name_list.append('interm_local_max')
+
     distance = distance_transform_edt(bw)
     im_watershed = watershed(-distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
 
@@ -61,5 +78,19 @@ def CETN2_HiPSC_Pipeline(struct_img,rescale_ratio):
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
 
-    return seg
+    out_img_list.append(seg.copy())
+    out_name_list.append('bw_final')
+
+    if output_type == 'default': 
+        # the default final output
+        save_segmentation(seg, False, output_path, fn)
+    elif output_type == 'AICS_pipeline':
+        # pre-defined output function for pipeline data
+        save_segmentation(seg, True, output_path, fn)
+    elif output_type == 'customize':
+        # the hook for passing in a customized output function
+        output_fun(out_img_list, out_name_list, output_path, fn)
+    else:
+        # the hook for other pre-defined RnD output functions (AICS internal)
+        CETN2_output(out_img_list, out_name_list, output_type, output_path, fn)
 

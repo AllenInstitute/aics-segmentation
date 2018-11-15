@@ -3,9 +3,10 @@ import os
 from ..core.vessel  import vesselness3D
 from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
+from aicssegmentation.core.output_utils import save_segmentation, TNNI1_Cardio_output
 
 
-def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
+def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
@@ -17,11 +18,17 @@ def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     minArea = 15
     ##########################################################################
 
+    out_img_list = []
+    out_name_list = []
+
     ###################
     # PRE_PROCESSING
     ###################
     # intenisty normalization (min/max)
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
+
+    out_img_list.append(struct_img.copy())
+    out_name_list.append('im_norm')
     
     # rescale if needed
     if rescale_ratio>0:
@@ -30,6 +37,9 @@ def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
 
     # smoothing 
     structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)
+
+    out_img_list.append(structure_img_smooth.copy())
+    out_name_list.append('im_smooth')
 
     ###################
     # core algorithm
@@ -49,159 +59,18 @@ def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio):
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
 
-    return seg
+    out_img_list.append(seg.copy())
+    out_name_list.append('bw_final')
 
-
-'''
-drug:
-0: vehicle
-1: Brefeldin
-2: Paclitaxol
-3: Staurosporine
-4: s-Nitro-Blebbistatin
-5: Rapamycin
-'''
-
-def ACTN1_drug(img, drug_type):
-
-    if drug_type==0:
-        bw = Vehicle(img)
-    elif drug_type==1:
-        bw = Brefeldin(img)
-    elif drug_type==2:
-        bw = Paclitaxol(img)
-    elif drug_type==3:
-        bw = Staurosporine(img)
-    elif drug_type==4:
-        bw = Blebbistatin(img)
-    elif drug_type==5:
-        bw = Rapamycin(img)
+    if output_type == 'default': 
+        # the default final output
+        save_segmentation(seg, False, output_path, fn)
+    elif output_type == 'AICS_pipeline':
+        # pre-defined output function for pipeline data
+        save_segmentation(seg, True, output_path, fn)
+    elif output_type == 'customize':
+        # the hook for passing in a customized output function
+        output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        print('unsupported drug type')
-        bw = None
-
-    return bw 
-
-
-def Vehicle(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Brefeldin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Paclitaxol(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-    
-def Staurosporine(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Blebbistatin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Rapamycin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-
-'''
-def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.05 #0.04
-    minArea = 12
-    dynamic_range = 10
-    ##########################################################################
-
-    # intenisty normalization (min/max)
-    max_range = min(np.max(struct_img), np.median(struct_img) + dynamic_range*np.std(struct_img))
-    struct_img[struct_img>max_range] = max_range
-    struct_img = (struct_img - struct_img.min() + 1e-8)/(max_range - struct_img.min() + 1e-8)
-    
-    # rescale if needed
-    
-    if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
-        struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0*rescale_ratio)
-    else:
-        img_smooth = ndi.gaussian_filter(struct_img, sigma=1, mode='nearest', truncate=3.0)
-
-    response = vesselness3D(img_smooth, scale_range=(1,3), scale_step=1,  tau=1, whiteonblack=True)
-    # range = (1,3) --> sigma = 1, 2 (3 is not included)
-
-    # thresholding the response
-    bw = response>thresh_3d
-    bw = remove_small_objects(bw, min_size=minArea, connectivity=3, in_place=False)
-
-    for zz in range(bw.shape[0]):
-        tmp = bw[zz,:,:]
-        tmp = remove_small_objects(tmp, min_size=minArea//2, connectivity=2)
-        bw[zz,:,:] = tmp
-
-    if rescale_ratio>0:
-        bw = processing.resize(bw, [1, 1/rescale_ratio, 1/rescale_ratio], method="nearest")
-        #bw_high_level = processing.resize(bw_high_level, [1, 1/rescale_ratio, 1/rescale_ratio], method="nearest")
-
-    bw = bw.astype(np.uint8)
-    bw[bw>0]=255
-
-    return bw
-'''
-
-
+        # the hook for other pre-defined RnD output functions (AICS internal)
+        TNNI1_Cardio_output(out_img_list, out_name_list, output_type, output_path, fn)

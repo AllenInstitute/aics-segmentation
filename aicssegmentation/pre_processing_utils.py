@@ -98,7 +98,7 @@ def suggest_normalization_param(structure_img0):
                 print(f'suggested upper range is {up_i-0.5}, which is {m+s*(up_i-0.5)}')
                 up_ratio = up_i-0.5
             else:
-                print(f'suggested upper range is {up_i}, which is {m+s*up_i}')
+                print(f'suggested lower range is {up_i}, which is {m+s*up_i}')
                 up_ratio = up_i
             break
 

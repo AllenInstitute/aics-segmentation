@@ -6,8 +6,9 @@ from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
 from scipy.ndimage.morphology import binary_fill_holes
+from aicssegmentation.core.output_utils import save_segmentation, NPM1_output
 
-def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio):
+def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
@@ -23,12 +24,18 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio):
     low_level_min_size = 700
     ##########################################################################
 
+    out_img_list = []
+    out_name_list = []
+
     ###################
     # PRE_PROCESSING
     ###################
     # intenisty normalization (min/max)
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
-    
+
+    out_img_list.append(struct_img.copy())
+    out_name_list.append('im_norm')
+
     # rescale if needed
     if rescale_ratio>0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
@@ -37,6 +44,9 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio):
 
     # smoothing with gaussian filter
     structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
+
+    out_img_list.append(structure_img_smooth.copy())
+    out_name_list.append('im_smooth')
 
     ###################
     # core algorithm
@@ -52,14 +62,20 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio):
     bw_low_level = remove_small_objects(bw_low_level, min_size=low_level_min_size, connectivity=1, in_place=True)
 
     # step 2: high level thresholding
+    local_cutoff = 0.333 * threshold_otsu(structure_img_smooth)
     bw_high_level = np.zeros_like(bw_low_level)
     lab_low, num_obj = label(bw_low_level, return_num=True, connectivity=1)
     for idx in range(num_obj):
         single_obj = (lab_low==(idx+1))
         local_otsu = threshold_otsu(structure_img_smooth[single_obj])
-        bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
+        if local_otsu > local_cutoff: 
+            bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
+
+    out_img_list.append(bw_high_level.copy())
+    out_name_list.append('bw_coarse')
 
     response_bright = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
+
     response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
     response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
 
@@ -86,108 +102,19 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio):
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
 
-    return seg
+    out_img_list.append(seg.copy())
+    out_name_list.append('bw_fine')
 
-'''
-drug:
-0: vehicle
-1: Brefeldin
-2: Paclitaxol
-3: Staurosporine
-4: s-Nitro-Blebbistatin
-5: Rapamycin
-'''
-
-def NPM_drug(img, drug_type):
-
-    if drug_type==0:
-        bw = Vehicle(img)
-    elif drug_type==1:
-        bw = Brefeldin(img)
-    elif drug_type==2:
-        bw = Paclitaxol(img)
-    elif drug_type==3:
-        bw = Staurosporine(img)
-    elif drug_type==4:
-        bw = Blebbistatin(img)
-    elif drug_type==5:
-        bw = Rapamycin(img)
+    if output_type == 'default': 
+        # the default final output
+        save_segmentation(seg, False, output_path, fn)
+    elif output_type == 'AICS_pipeline':
+        # pre-defined output function for pipeline data
+        save_segmentation(seg, True, output_path, fn)
+    elif output_type == 'customize':
+        # the hook for passing in a customized output function
+        output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        print('unsupported drug type')
-        bw = None
+        # the hook for other pre-defined RnD output functions (AICS internal)
+        NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
 
-    return bw 
-
-
-def Vehicle(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Brefeldin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Paclitaxol(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-    
-def Staurosporine(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Blebbistatin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 
-
-def Rapamycin(struct_img):
-    ##########################################################################
-    # PARAMETERS:
-    #   note that these parameters are supposed to be fixed for the structure
-    #   and work well accross different datasets
-    thresh_3d = 0.1
-    minArea = 5
-    dynamic_range = 7
-    ##########################################################################
-
-    return bw 

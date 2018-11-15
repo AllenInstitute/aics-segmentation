@@ -3,21 +3,19 @@ import os
 from skimage.morphology import remove_small_objects
 from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from ..core.vessel import vesselness3D
-from aicssegmentation.core.output_utils import save_segmentation, ACTN1_output
+from aicssegmentation.core.output_utils import save_segmentation, ATP2A2_Cardio_output
 
 
-def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def ATP2A2_Cardio_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [3, 15]  
-    vesselness_sigma_1 = [2]
-    vesselness_cutoff_1 = 0.15
-    vesselness_sigma_2 = [1]
-    vesselness_cutoff_2 = 0.05
-    minArea = 5
+    intensity_norm_param = [1, 20]
+    vesselness_sigma = [1]
+    vesselness_cutoff = 0.002
+    minArea = 15
     ##########################################################################
 
     out_img_list = []
@@ -26,7 +24,7 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     ###################
     # PRE_PROCESSING
     ###################
-    # intenisty normalization 
+    # intenisty normalization (min/max)
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
 
     out_img_list.append(struct_img.copy())
@@ -36,9 +34,9 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     if rescale_ratio>0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-    
-    # smoothing 
-    structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)
+
+    # smoothing with gaussian filter
+    structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)  
 
     out_img_list.append(structure_img_smooth.copy())
     out_name_list.append('im_smooth')
@@ -48,14 +46,13 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     ###################
 
     # vesselness 3d 
-    response_1 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_1,  tau=1, whiteonblack=True)
-    response_2 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_2,  tau=1, whiteonblack=True)
-    bw = np.logical_or(response_1 > vesselness_cutoff_1,  response_2 > vesselness_cutoff_2)
+    response = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma,  tau=1, whiteonblack=True)
+    bw = response > vesselness_cutoff
     
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw, min_size=minArea, connectivity=1, in_place=False)
+    seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0
@@ -76,4 +73,6 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
         output_fun(out_img_list, out_name_list, output_path, fn)
     else:
         # the hook for other pre-defined RnD output functions (AICS internal)
-        ACTN1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        ATP2A2_Cardio_output(out_img_list, out_name_list, output_type, output_path, fn)
+
+
