@@ -19,7 +19,7 @@ def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, f
     gaussian_smoothing_truncate_range = 3.0
     cell_wise_min_area = 1200
     dot_3d_sigma = 1.6
-    dot_3d_cutoff = 0.04
+    dot_3d_cutoff = 0.02
     minArea = 10
     thin_dist = 1
     thin_dist_preserve = 1.6
@@ -72,11 +72,11 @@ def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, f
     response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw_extra = response > dot_3d_cutoff
 
-    # combine the two parts
-    bw = np.logical_or(bw_high_level, bw_extra)
-
     # thinning
     bw_high_level = morphology_preserving_thinning(bw_high_level, thin_dist_preserve, thin_dist)
+
+    # combine the two parts
+    bw = np.logical_or(bw_high_level, bw_extra)
 
     ###################
     # POST-PROCESSING

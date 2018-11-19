@@ -2,7 +2,7 @@ import numpy as np
 import os
 from skimage.morphology import remove_small_objects
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
-from ..core.seg_dot import dot_3d
+from ..core.seg_dot import dot_slice_by_slice
 from aicssegmentation.core.output_utils import save_segmentation, CTNNB1_output
 
 
@@ -12,12 +12,12 @@ def CTNNB1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [3, 16.5]
+    intensity_norm_param = [4, 27]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    dot_3d_sigma = 1.5
-    dot_3d_cutoff = 0.02
-    minArea = 5
+    dot_2d_sigma = 1.5
+    dot_2d_cutoff = 0.01
+    minArea = 10
     ##########################################################################
 
     out_img_list = []
@@ -31,14 +31,14 @@ def CTNNB1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn
 
     out_img_list.append(struct_img.copy())
     out_name_list.append('im_norm')
-    
+
     # rescale if needed
     if rescale_ratio>0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
-    # smoothing with gaussian filter
+    # smoothing
     structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
     out_img_list.append(structure_img_smooth.copy())
@@ -48,13 +48,13 @@ def CTNNB1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn
     # core algorithm
     ###################
 
-    response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
-    bw = response > dot_3d_cutoff
+    response = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
+    bw = response > dot_2d_cutoff
 
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
+    seg = remove_small_objects(bw, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0
@@ -64,7 +64,7 @@ def CTNNB1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn
     out_img_list.append(seg.copy())
     out_name_list.append('bw_final')
 
-    if output_type == 'default': 
+    if output_type == 'default':
         # the default final output
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'AICS_pipeline':
@@ -76,4 +76,3 @@ def CTNNB1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn
     else:
         # the hook for other pre-defined RnD output functions (AICS internal)
         CTNNB1_output(out_img_list, out_name_list, output_type, output_path, fn)
-

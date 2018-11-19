@@ -12,12 +12,12 @@ def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn,
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [3, 15] 
+    intensity_norm_param = [3, 15]
     vesselness_sigma_1 = [2]
-    vesselness_cutoff_1 = 0.15
+    vesselness_cutoff_1 = 0.1
     vesselness_sigma_2 = [1]
-    vesselness_cutoff_2 = 0.06
-    minArea = 10
+    vesselness_cutoff_2 = 0.04
+    minArea = 15
     ##########################################################################
 
     out_img_list = []
@@ -26,9 +26,9 @@ def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn,
     ###################
     # PRE_PROCESSING
     ###################
-    # intenisty normalization 
+    # intenisty normalization
     struct_img = intensity_normalization(struct_img, scaling_param=intensity_norm_param)
-    
+
     out_img_list.append(struct_img.copy())
     out_name_list.append('im_norm')
 
@@ -36,7 +36,7 @@ def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn,
     if rescale_ratio > 0:
         struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
-    
+
     # smoothing with gaussian filter
     structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)
 
@@ -47,11 +47,11 @@ def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn,
     # core algorithm
     ###################
 
-    # vesselness 3d 
+    # vesselness 3d
     response_1 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_1,  tau=1, whiteonblack=True)
     response_2 = vesselness3D(structure_img_smooth, sigmas=vesselness_sigma_2,  tau=1, whiteonblack=True)
-    bw = np.logical_or(response_1 > vesselness_cutoff_1, response_2 > vesselness_cutoff_2) 
-    
+    bw = np.logical_or(response_1 > vesselness_cutoff_1, response_2 > vesselness_cutoff_2)
+
     ###################
     # POST-PROCESSING
     ###################
@@ -65,7 +65,7 @@ def ACTB_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn,
     out_img_list.append(seg.copy())
     out_name_list.append('bw_final')
 
-    if output_type == 'default': 
+    if output_type == 'default':
         # the default final output
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'AICS_pipeline':
