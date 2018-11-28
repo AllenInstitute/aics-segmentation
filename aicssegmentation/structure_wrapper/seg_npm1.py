@@ -68,7 +68,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
     for idx in range(num_obj):
         single_obj = (lab_low==(idx+1))
         local_otsu = threshold_otsu(structure_img_smooth[single_obj])
-        if local_otsu > local_cutoff: 
+        if local_otsu > local_cutoff:
             bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
 
     out_img_list.append(bw_high_level.copy())
@@ -79,15 +79,16 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
     response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
     response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
 
-    inner_mask = bw_high_level.copy()
-    for zz in range(inner_mask.shape[0]):
-        inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
+    #inner_mask = bw_high_level.copy()
+    #for zz in range(inner_mask.shape[0]):
+    #    inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
 
     holes = np.logical_or(response_dark>dot_2d_cutoff , response_dark_extra>dot_2d_cutoff)
-    holes[~inner_mask] = 0
+    #holes[~inner_mask] = 0
 
     bw_extra = response_bright>dot_2d_cutoff
-    bw_extra[~bw_high_level]=0
+    #bw_extra[~bw_high_level]=0
+    bw_extra[~bw_low_level]=0
 
     bw_final = np.logical_or(bw_extra, bw_high_level)
     bw_final[holes]=0
@@ -105,7 +106,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
     out_img_list.append(seg.copy())
     out_name_list.append('bw_fine')
 
-    if output_type == 'default': 
+    if output_type == 'default':
         # the default final output
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'AICS_pipeline':
@@ -117,4 +118,3 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
     else:
         # the hook for other pre-defined RnD output functions (AICS internal)
         NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
-

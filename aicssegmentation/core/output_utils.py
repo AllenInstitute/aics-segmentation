@@ -57,14 +57,18 @@ def FBL_output(out_img_list, out_name_list, output_type, output_path, fn):
     if output_type == 'AICS_RnD':
         out_flag = []
         for i in range(len(out_name_list)):
-            if out_name_list[i] == 'im_smooth':
+            if out_name_list[i] == 'bw_coarse':
                 out_flag.append(True)
+                bw = out_img_list[i].astype(np.uint8)
+                bw[bw>0]=255
+                out_img_list[i] = bw
+                out_name_list[i] = 'struct_segmentation_coarse' # use default name
             elif out_name_list[i] == 'bw_fine':
                 out_flag.append(True)
                 bw = out_img_list[i].astype(np.uint8)
                 bw[bw>0]=255
                 out_img_list[i] = bw
-                out_name_list[i] = 'struct_segmentation' # use default name
+                out_name_list[i] = 'struct_segmentation_fine' # use default name
             else:
                 out_flag.append(False)
 
@@ -119,7 +123,25 @@ def LAMP1_output(out_img_list, out_name_list, output_type, output_path, fn):
 def NPM1_output(out_img_list, out_name_list, output_type, output_path, fn):
 
     if output_type == 'AICS_RnD':
-        paperFigure(out_img_list, out_name_list, output_type, output_path, fn)
+        out_flag = []
+        for i in range(len(out_name_list)):
+            if out_name_list[i] == 'bw_coarse':
+                out_flag.append(True)
+                bw = out_img_list[i].astype(np.uint8)
+                bw[bw>0]=255
+                out_img_list[i] = bw
+                out_name_list[i] = 'struct_segmentation_coarse' # use default name
+            elif out_name_list[i] == 'bw_fine':
+                out_flag.append(True)
+                bw = out_img_list[i].astype(np.uint8)
+                bw[bw>0]=255
+                out_img_list[i] = bw
+                out_name_list[i] = 'struct_segmentation_fine' # use default name
+            else:
+                out_flag.append(False)
+
+        output_hook(out_img_list, out_name_list, out_flag, output_path, fn)
+
 
 def SEC61B_output(out_img_list, out_name_list, output_type, output_path, fn):
 
