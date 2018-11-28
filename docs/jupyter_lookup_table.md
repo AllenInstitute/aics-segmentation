@@ -41,19 +41,12 @@ jupyter notebook
 
 (Note: change the conda environment name and github repository path accordingly)
 
-Now, you should Jupyter starts in your default brower and you can open "playground_dots.ipynb
+Now, your Jupyter should have started in your default brower and you can open "playground_dots.ipynb
 
-```bash
+(A quick start guide on how executing a notebook can be found [here](https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/execute.html#executing-a-notebook))
 
-```
+Follow the instruct embedded in the notebook to tune the workflow for segmenting your images
 
-# Apply Classic Image Segmentation Workflow on Your Own Data (using Jupyter Notebook)
+## Step 3: build a batch processing scripts using the segmentation workflow you just tuned
 
-Our goal is you may checkout the lookup table first and find the structure with most similar morphology as the objects in your data. For example, you are also working on the segmentation of some "point-source" structure (i.e., spots-like shapes). You may go to DSP.ipynb to (1) test your data with the algorithm and parameters optimized on our data, (2) follow the instruction coded inside the notebook to tweak the parameters so that it works can also work well on your data.
-
-=============
-
-
-More contents are coming.
-
-Right now, you may use ./lookup_table_demo/DSP.ipynb to get some sense of what is inside each notebook.
+If you need to consistently segment more than a few images similar to the one you just experimented with, you can easily build a batch processing program following the steps below.
