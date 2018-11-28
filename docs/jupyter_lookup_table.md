@@ -9,7 +9,9 @@ A suggested way for using our toolkit is
 
 ## step 1: find the entry in the lookup table with most similar morphology to your data
 
-For example, you have Endosomes (Ras-related protein Rab-5A) ![rab5a raw](./rab5a_raw.jpg)
+For example, you have Endosomes (Ras-related protein Rab-5A) 
+
+![rab5a raw](./rab5a_raw.jpg)
 
 # Apply Classic Image Segmentation Workflow on Your Own Data (using Jupyter Notebook)
 
