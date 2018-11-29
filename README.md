@@ -26,6 +26,8 @@ What you have installed is actually a collection of many many image analysis and
 
 The "design philosophy" of our package is (1) to provide a simple tool for cell biologists to quickly obtain intracelluar structure segmentation with reasonable accuracy and robustness over a large set of images, (2) if by chance, experienced developers need to design a more sophisticated algorithm, we hope our package could facilitate such advanced development and implementation, as a unified development environment.
 
+Visualization is a key component in algorithm development and results validation (qualitatively). Right now, our toolkit is utilizing [itk-jupyter-widgets](https://github.com/InsightSoftwareConsortium/itk-jupyter-widgets), which is a very powerful in-jupyter visualization tool primarily designed for medical data. Some cool demo videos can be found [here](https://www.youtube.com/playlist?list=PL2lHcsoU0YJsh6f8j2vbhg2eEpUnKEWcl).
+
 ### Part 1: Quick segmentation for **Users**
 
 This toolkit is
@@ -40,4 +42,3 @@ This toolkit is
 
 ## Level of Support
 Currently, we are at soft-release stage. We are simply releasing it to the community AS IS. It has been used within our organization. We are not able to provide any guarantees of support. The community is welcome to submit issues. Contact: Jianxu Chen (jianxuc@alleninstitute.org)
-

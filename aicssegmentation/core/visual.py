@@ -5,7 +5,7 @@ import ipywidgets as widgets
 from ipywidgets import interact, fixed
 from IPython.display import display
 
-from itkwidgets import view 
+from itkwidgets import view
 
 def sliceViewer(im, zz):
     plt.imshow(im[zz,:,:])
@@ -15,7 +15,7 @@ def explore_dot_3d(img, sigma, th, roi=[-1]):
     # roi = [x0, y0, x1, y1]
     if roi[0]<0:
         roi = [0,0,img.shape[1],img.shape[2]]
-    
+
     im = img[:,roi[1]:roi[3],roi[0]:roi[2]]
 
     from aicssegmentation.core.seg_dot import dot_3d
@@ -92,29 +92,26 @@ def mipView(im):
     plt.imshow(mip)
     plt.show()
 
-def img_seg_combine(img,seg, roi=[-1]):
-
-    # roi = [x0, y0, x1, y1]
-    if roi[0]<0:
-        roi = [0,0,img.shape[1],img.shape[2]]
+def img_seg_combine(img, seg, roi=['Full',None]):
 
     # normalize to 0~1
     img = img.astype(np.float32)
     img = (img-img.min())/(img.max()-img.min())
     seg = seg.astype(np.float32)
     seg[seg>0]=1
-    
-    img = img[:,roi[1]:roi[3],roi[0]:roi[2]]
-    seg = seg[:,roi[1]:roi[3],roi[0]:roi[2]]
+
+    if roi[0]=='ROI' or roi[0]=='roi':
+        img = img[roi[1]]
+        seg = seg[roi[1]]
 
     # combine
     combined = np.concatenate((seg, img), axis=2)
-    
+
     ## overlay
     #ovelay = img.copy()
     #ovelay[seg>0]=1
     #combined = np.concatenate((combined, ovelay), axis=2)
-    
+
     #  view
     return combined
 
@@ -123,7 +120,7 @@ def segmentation_quick_view(seg):
     if len(valid_pxl)<1:
         print('segmentation is empty')
         return
-    
+
     seg = seg>0
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
@@ -131,16 +128,16 @@ def segmentation_quick_view(seg):
     return seg
 
 def single_fluorescent_view(im):
-    
+
     assert len(im.shape)==3
 
     im = im.astype(np.float32)
     im = (im - im.min())/(im.max()-im.min())
 
-    return im 
+    return im
 
-def seg_fluo_side_by_side(im, seg, roi=[-1]):
+def seg_fluo_side_by_side(im, seg, roi=['Full',None]):
 
-    out = img_seg_combine(im,seg, roi)
-    
-    return out 
+    out = img_seg_combine(im, seg, roi)
+
+    return out

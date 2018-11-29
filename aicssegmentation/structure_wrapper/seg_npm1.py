@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from skimage.morphology import remove_small_objects, erosion, ball
+from skimage.morphology import remove_small_objects, erosion, ball, dilation
 from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
@@ -60,6 +60,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
     th_low_level = (global_tri + global_median)/2
     bw_low_level = structure_img_smooth > th_low_level
     bw_low_level = remove_small_objects(bw_low_level, min_size=low_level_min_size, connectivity=1, in_place=True)
+    bw_low_level = dilation(bw_low_level, selem=ball(2))
 
     # step 2: high level thresholding
     local_cutoff = 0.333 * threshold_otsu(structure_img_smooth)
@@ -69,7 +70,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
         single_obj = (lab_low==(idx+1))
         local_otsu = threshold_otsu(structure_img_smooth[single_obj])
         if local_otsu > local_cutoff:
-            bw_high_level[np.logical_and(structure_img_smooth>local_otsu, single_obj)]=1
+            bw_high_level[np.logical_and(structure_img_smooth>0.98*local_otsu, single_obj)]=1
 
     out_img_list.append(bw_high_level.copy())
     out_name_list.append('bw_coarse')

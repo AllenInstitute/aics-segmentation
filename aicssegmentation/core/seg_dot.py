@@ -7,9 +7,16 @@ def dot_3d(struct_img, log_sigma):
     responce = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img, log_sigma)
     return responce
 
+def dot_3d_wrapper(struct_img, s3_param):
+    bw = np.zeros(struct_img.shape, dtype=bool)
+    for fid in range(len(s3_param)):
+        log_sigma = s3_param[fid][0]
+        responce = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img, log_sigma)
+        bw = np.logical_or(bw, responce>s3_param[fid][1])
+    return bw
 
 def dot_2d(struct_img, log_sigma):
-    assert len(struct_img.shape) == 2 
+    assert len(struct_img.shape) == 2
     responce = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img, log_sigma)
     return responce
 
