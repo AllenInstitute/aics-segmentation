@@ -12,7 +12,7 @@ A suggested way for using our toolkit is
 
 List of "playground":
 
-1. playground_golgi.ipynb: workflow for Sialyltransferase 1
+1. playground_st6gal1.ipynb: workflow for Sialyltransferase 1
 2. playground_fbl.ipynb: workflow for Fibrillarin
 3. playground_npm1.ipynb: workflow for Nucleophosmin
 4. playground_curvi.ipynb: workflows for Sec61 beta, Tom 20, Lamin B1 (mitosis-specific)

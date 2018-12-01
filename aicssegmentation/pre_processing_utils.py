@@ -79,17 +79,17 @@ def boundary_preserving_smoothing_3d(struct_img, numberOfIterations=5, conductan
 
 def suggest_normalization_param(structure_img0):
     m, s = norm.fit(structure_img0.flat)
-    print(m)
-    print(s)
+    print(f'mean intensity of the stack: {m}')
+    print(f'the standard deviation of intensity of the stack: {s}')
 
     p99 = np.percentile(structure_img0, 99.99)
-    print(p99)
+    print(f'0.9999 percentile of the stack intensity is: {p99}')
 
     pmin = structure_img0.min()
-    print(pmin)
+    print(f'minimum intensity of the stack: {pmin}')
 
     pmax = structure_img0.max()
-    print(pmax)
+    print(f'maximum intensity of the stack: {pmax}')
 
     up_ratio = 0
     for up_i in np.arange(0.5, 1000, 0.5):
@@ -98,17 +98,18 @@ def suggest_normalization_param(structure_img0):
                 print(f'suggested upper range is {up_i-0.5}, which is {m+s*(up_i-0.5)}')
                 up_ratio = up_i-0.5
             else:
-                print(f'suggested lower range is {up_i}, which is {m+s*up_i}')
+                print(f'suggested upper range is {up_i}, which is {m+s*up_i}')
                 up_ratio = up_i
             break
 
     low_ratio = 0
     for low_i in np.arange(0.5, 1000, 0.5):
         if m-s*low_i < pmin:
-            print(f'suggested upper range is {low_i-0.5}, which is {m-s*(low_i-0.5)}')
+            print(f'suggested lower range is {low_i-0.5}, which is {m-s*(low_i-0.5)}')
             low_ratio = low_i-0.5
             break
 
     print(f'So, suggested parameter for normalization is [{low_ratio}, {up_ratio}]')
-    print('You may also increase the first value (may loss some dim parts), or decrease the second value' +
-          '(may loss some texture in super bright regions) to further enhance the contrast')
+    print('To further enhance the contrast: You may increase the first value (may loss some dim parts), or decrease the second value' +
+          '(may loss some texture in super bright regions)')
+    print('To slightly reduce the contrast: You may decrease the first value, or increase the second value')

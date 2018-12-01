@@ -5,8 +5,8 @@ from skimage.morphology import erosion, ball
 import aicsimageio
 
 
-def morphology_preserving_thinning(bw, min_thickness=1, thin=1):
-
+def topology_preserving_thinning(bw, min_thickness=1, thin=1):
+    bw = bw>0
     safe_zone = np.zeros_like(bw)
     for zz in range(bw.shape[0]):
         if np.any(bw[zz, :, :]):

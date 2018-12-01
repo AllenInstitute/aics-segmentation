@@ -5,7 +5,7 @@ from ..pre_processing_utils import intensity_normalization, image_smoothing_gaus
 from ..core.seg_dot import dot_3d
 from skimage.measure import label
 from skimage.filters import threshold_triangle, threshold_otsu
-from aicssegmentation.core.utils import morphology_preserving_thinning
+from aicssegmentation.core.utils import topology_preserving_thinning
 from aicssegmentation.core.output_utils import save_segmentation, ST6GAL1_output
 
 def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -73,7 +73,7 @@ def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, f
     bw_extra = response > dot_3d_cutoff
 
     # thinning
-    bw_high_level = morphology_preserving_thinning(bw_high_level, thin_dist_preserve, thin_dist)
+    bw_high_level = topology_preserving_thinning(bw_high_level, thin_dist_preserve, thin_dist)
 
     # combine the two parts
     bw = np.logical_or(bw_high_level, bw_extra)
