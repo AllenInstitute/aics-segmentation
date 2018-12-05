@@ -9,6 +9,8 @@
 
 Note: Depending on the time you access this page, you may be directed to the download page of "Build Tools for Visual Studio 2017" or "Build Tools for Visual Studio 2018", etc. In general, the latest version should be good, as long as the version is at least 2015. 
 
+When you install the Build Tool, you may be asked to choose what to install. You may only select the tool for Visual Studio C++. Also, after intalling the Build Tool, make sure to reboot your machine. 
+
 ## Step 2: Setup conda environment 
 
 [What is conda and anaconda, and why we need this?](conda_why.md) In short, setting up conda will make all the following setups straightforward and greatly avoid future problems (conda itself is also very easy to set up).
@@ -44,7 +46,7 @@ activate segmentation
 git --version
 ```
 
-If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install.
+If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install. It is okay to just use default installation settings. Also, you need to restart Anaconda after installing Git.
 
 #### 2. Clone aics-segmentation repository from Github (suppose you want to save the folder under 'C:\Projects')
 
@@ -59,6 +61,7 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 ### Option 1: Install from PyPi (simple and recommend for most users)
 
 ```bash
+pip install numpy
 pip install aicssegmentation
 ```
 ### Option 2: Build from source (only if you want to make changes on the source code)

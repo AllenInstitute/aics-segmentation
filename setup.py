@@ -39,7 +39,7 @@ extras = {
 
 setup(name=PACKAGE_NAME,
       version=MODULE_VERSION,
-      description='Scripts for image features calculation.',
+      description='Scripts for structure segmentation.',
       long_description=readme(),
       author='AICS',
       author_email='jianxuc@alleninstitute.org',

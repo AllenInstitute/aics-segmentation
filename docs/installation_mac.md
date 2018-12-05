@@ -63,8 +63,10 @@ pip install aicssegmentation
 ### Option 2: Build from source (only if you want to make changes on the source code)
 
 ```bash
+pip install numpy
 cd ~/Projects/aics-segmentation
 pip install -e .
+pip install itkwidgets
 ```
 
 ## Step 5: Test jupyter notebook demo
