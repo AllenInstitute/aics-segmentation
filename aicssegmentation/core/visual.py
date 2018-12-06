@@ -103,6 +103,9 @@ def img_seg_combine(img, seg, roi=['Full',None]):
     if roi[0]=='ROI' or roi[0]=='roi':
         img = img[roi[1]]
         seg = seg[roi[1]]
+    elif roi[0]=='manual' or roi[0]=='M':
+        img = img[:,roi[1][1]:roi[1][3],roi[1][0]:roi[1][2]]
+        seg = seg[:,roi[1][1]:roi[1][3],roi[1][0]:roi[1][2]]
 
     # combine
     combined = np.concatenate((seg, img), axis=2)
