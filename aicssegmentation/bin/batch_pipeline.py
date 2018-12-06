@@ -39,7 +39,8 @@ STRUCTURE_MAPPING = {
     'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'},
     'ATP2A2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_atp2a2', 'class': 'ATP2A2_Cardio_Pipeline'},
     'MYL7_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_myl7', 'class': 'MYL7_Cardio_Pipeline'},
-    'ACTN2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_actn2', 'class': 'ACTN2_Cardio_Pipeline'}
+    'ACTN2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_actn2', 'class': 'ACTN2_Cardio_Pipeline'},
+    'TEMPLATE': {'module': 'aicssegmentation.structure_wrapper.seg_template', 'class': 'TEMPLATE_Cardio_Pipeline'}
 }
 
 

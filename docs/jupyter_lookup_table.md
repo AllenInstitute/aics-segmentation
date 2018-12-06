@@ -50,3 +50,26 @@ Follow the instruct embedded in the notebook to tune the workflow for segmenting
 ## Step 3: build a batch processing scripts using the segmentation workflow you just tuned
 
 If you need to consistently segment more than a few images similar to the one you just experimented with, you can easily build a batch processing program following the steps below.
+
+For example, you have finalize your segmentation workflow for Rab-5A.
+
+1. duplicate the template file in `/aics-segmentation/aicssegmentation/structure_wrapper/seg_template.py` as `/aics-segmentation/aicssegmentation/structure_wrapper/seg_RAB5A.py`
+
+2. Open seg_RAB5A.py
+
+3. Change the function name from `TEMPLATE_HiPSC_Pipeline()` to `RAB5A_HiPSC_Pipeline()` on line 12
+
+4. insert you parameters and functions at the placeholders (searching `#ADD-HERE` in the code). You can also check the other files under structure_wrapper to see examples.
+
+5. Save the file.
+
+6. go to `aics-segmentation/aicssegmentation/bin/batch_pipeline.py`
+
+7. On line 43, change `'TEMPLATE': {'module': 'aicssegmentation.structure_wrapper.seg_template', 'class': 'TEMPLATE_Cardio_Pipeline'}` into `'RAB5A': {'module': 'aicssegmentation.structure_wrapper.seg_RAB5A', 'class': 'RAB5A_Cardio_Pipeline'}`
+
+8. Process your data with run_toolkit.sh. (Make sure you change the file path to your data inside this script.)
+
+```bash
+cd /aics-segmentation/aicssegmentation/bin/
+./run_toolkit.sh
+```
