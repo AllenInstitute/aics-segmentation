@@ -68,7 +68,9 @@ pip install aicssegmentation
 
 ```bash
 cd C:\Projects\aics-segmentation\
+pip install numpy
 pip install -e .
+pip install itkwidgets
 ```
 
 ## Step 5: Test jupyter notebook demo
