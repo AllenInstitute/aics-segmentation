@@ -10,7 +10,7 @@
 
 ## Step 2: Setup conda environment 
 
-[What is conda and anaconda, and why we need this?](conda_why.md) In short, setting up conda will make all the following setups straightforward and greatly avoid future problems (conda itself is also very easy to set up).
+[What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
 
 #### 1. [Install conda on macOS](https://conda.io/docs/user-guide/install/macos.html), choose anaconda installer.
 
@@ -19,7 +19,7 @@
 
 All commands below are typed into the Terminal Window
 
-#### 3. Create a new empty conda environment (suppose we use name "segmentation" for this environment)
+#### 3. Create a new empty conda environment, which we will name "segmentation" (You can certainly choose a different name.)
 
 ``` bash 
 conda create -n segmentation python=3.6
@@ -55,18 +55,19 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 ## Step 4: Install the package
 
 
-### Option 1: Install from PyPi (simple and recommend for most users)
+### Option 1: Build from source (recommended)
+
+```bash
+cd ~/Projects/aics-segmentation
+pip install numpy
+pip install -e .
+pip install itkwidgets
+```
+
+### Option 2: Install from PyPi (useful when running on a server/cluster)
 
 ```bash
 pip install aicssegmentation
-```
-### Option 2: Build from source (only if you want to make changes on the source code)
-
-```bash
-pip install numpy
-cd ~/Projects/aics-segmentation
-pip install -e .
-pip install itkwidgets
 ```
 
 ## Step 5: Test jupyter notebook demo
@@ -77,6 +78,5 @@ cd ~/Projects/aics-segmentation/lookup_table_demo
 jupyter notebook
 ```
 
-This will take you to your default browser (e.g., Safari) and launch Jupyter Notebook App within your browser. Then, you can test if you can run the demo or not. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_notebook_table.md)
-
+This will take you to your default browser (e.g., Safari) and launch Jupyter Notebook App within your browser.Open "demo_RAB5.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
 
