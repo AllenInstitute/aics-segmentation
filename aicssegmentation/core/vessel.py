@@ -26,6 +26,15 @@ def blobness3D(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblac
 
     return np.max(filtered_array, axis=0)
 
+def filament_3d_wrapper(struct_img, f3_param):
+    bw = np.zeros(struct_img.shape, dtype=bool)
+    for fid in range(len(f3_param)):
+        sigma = f3_param[fid][0]
+        eigenvalues = absolute_3d_hessian_eigenvalues(struct_img, sigma=sigma, scale=True, whiteonblack=True)
+        responce = compute_vesselness3D(eigenvalues[1], eigenvalues[2], tau=1)
+        bw = np.logical_or(bw, responce>f3_param[fid][1])
+    return bw
+
 
 def vesselness3D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
