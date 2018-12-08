@@ -7,13 +7,13 @@
 
 [Download and install the Build Tools from Microsoft](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
 
-Note: Depending on the time you access this page, you may be directed to the download page of "Build Tools for Visual Studio 2017" or "Build Tools for Visual Studio 2018", etc. In general, the latest version should be good, as long as the version is at least 2015. 
+Note: Depending on the time you access this page, you may be directed to the download page of "Build Tools for Visual Studio 2017" or "Build Tools for Visual Studio 2018", etc. In general, as long as the version is at least 2015, any subsequent version should work. 
 
-When you install the Build Tool, you may be asked to choose what to install. You may only select the tool for Visual Studio C++. Also, after intalling the Build Tool, make sure to reboot your machine. 
+When you install the Build Tool, you may be asked to choose what to install. Only the tool for Visual Studio C++ is required for the Allen Cell Segmenter. After intalling the Build Tool, make sure to reboot your machine. 
 
 ## Step 2: Setup conda environment 
 
-[What is conda and anaconda, and why we need this?](conda_why.md) In short, setting up conda will make all the following setups straightforward and greatly avoid future problems (conda itself is also very easy to set up).
+[What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
 
 #### 1. [Install conda on Windows](https://conda.io/docs/user-guide/install/windows.html?highlight=conda), choose anaconda installer.
 
@@ -22,7 +22,7 @@ When you install the Build Tool, you may be asked to choose what to install. You
 
 All commands below are typed into Anaconda Prompt window
 
-#### 3. Create a new empty conda environment (suppose we use name "segmentation" for this environment)
+#### 3. Create a new empty conda environment, which we will name "segmentation" (You can certainly choose a different name.)
 
 ``` bash 
 conda create -n segmentation python=3.6
@@ -46,7 +46,7 @@ activate segmentation
 git --version
 ```
 
-If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install. It is okay to just use default installation settings. Also, you need to restart Anaconda after installing Git.
+If you don't have git, follow [Git for Windows](https://www.atlassian.com/git/tutorials/install-git#windows) to install. It is okay to just use default installation settings. You will need to restart Anaconda after installing Git.
 
 #### 2. Clone aics-segmentation repository from Github (suppose you want to save the folder under 'C:\Projects')
 
@@ -58,19 +58,19 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 ## Step 4: Install the package
 
 
-### Option 1: Install from PyPi (simple and recommend for most users)
+### Option 1: Build from source (recommended)
 
 ```bash
-pip install numpy
-pip install aicssegmentation
-```
-### Option 2: Build from source (only if you want to make changes on the source code)
-
-```bash
-cd C:\Projects\aics-segmentation\
+cd ~/Projects/aics-segmentation
 pip install numpy
 pip install -e .
 pip install itkwidgets
+```
+
+### Option 2: Install from PyPi (useful when running on a server/cluster)
+
+```bash
+pip install aicssegmentation
 ```
 
 ## Step 5: Test jupyter notebook demo
@@ -81,6 +81,6 @@ cd C:\Projects\aics-segmentation\lookup_table_demo
 jupyter notebook, choose anaconda installer.
 ```
 
-This will take you to your default browser (e.g., Chrome) and launch Jupyter Notebook App within your browser. Then, you can test if you can run the demo or not. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_notebook_table.md)
+This will take you to your default browser (e.g., Chrome) and launch Jupyter Notebook App within your browser. Open "demo_RAB5.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
 
 

@@ -1,16 +1,14 @@
 # Documentation for Users
 
-A suggested way for using our toolkit is
+We recommend that users start by
 
-(1) check out the lookup table and find an entry in the lookup table where the segmentation tasks is the most similar to yours;
-(2) go to correspoinding Jupyter Notebook and follow the detailed instruction in the notebook to tune the workflow;
-(3) After finalizing the algorithms and parameters in the workflow, modify batch_pipeline.py to batch process all data (file by file or folder by folder).
+Identifying a structure in the lookup table that looks most similar to the segmentation task that you are faced with. Once you have identified this structure, open the correspoinding Jupyter Notebook and follow the instructions in the notebook to tune the workflow for your particular task. Finally, after finalizing the algorithms and parameters in the workflow, modify batch_pipeline.py to batch process all data (file by file or folder by folder).
 
 
 ## Step 1: Find the entry in the lookup table with most similar morphology to your data
 
 
-List of "playground":
+List of "playgrounds" accomoanying the lookup table:
 
 1. playground_st6gal.ipynb: workflow for Sialyltransferase 1
 2. playground_fbl.ipynb: workflow for Fibrillarin
@@ -23,11 +21,11 @@ List of "playground":
 9. playground_filament3d.ipynb: workflows for Tight junction protein ZO1, Beta actin, Non-muscle myosin IIB, Alpha-actinin-1, Alpha tubulin, Troponin I, and Titin
 10. playground_shell.ipynb: workflow for Lamin B1 (Interphase-specific)
 
-For example, you have Endosomes (Ras-related protein Rab-5A)
+For example, if your structure is localized to endosomes (such as Ras-related protein Rab-5A)
 
 ![rab5a raw](./rab5a_raw.jpg)
 
-Visually, it has similar morphology as Peroxisomes (Peroxisomal membrane protein PMP34). The correspoinding Jupyter Notebook is playground_dots.ipynb
+Visually, it has similar morphology to peroxisomes (peroxisomal membrane protein PMP34). Thusm the most applicable Jupyter Notebook is playground_dots.ipynb
 
 ## Step 2: Go to the Jupyter Notebook and tune the workflow
 
