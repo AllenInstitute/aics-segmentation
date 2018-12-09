@@ -3,7 +3,50 @@ from skimage.morphology import medial_axis
 from scipy.ndimage import distance_transform_edt
 from skimage.morphology import erosion, ball
 import aicsimageio
+from skimage.measure import label
 
+def hole_filling(bw, hole_min, hole_max, fill_2d=True):
+
+    bw = bw>0
+    if len(bw.shape)==2:
+        background_lab = label(~bw, connectivity=1)
+        fill_out = np.copy(background_lab)
+        component_sizes = np.bincount(background_lab.ravel())
+        too_big = component_sizes >hole_max
+        too_big_mask = too_big[background_lab]
+        fill_out[too_big_mask] = 0
+        too_small = component_sizes <hole_min
+        too_small_mask = too_small[background_lab]
+        fill_out[too_small_mask] = 0
+    elif len(bw.shape)==3:
+        if fill_2d:
+            fill_out = np.zeros_like(bw)
+            for zz in range(bw.shape[0]):
+                background_lab = label(~bw[zz,:,:], connectivity=1)
+                out = np.copy(background_lab)
+                component_sizes = np.bincount(background_lab.ravel())
+                too_big = component_sizes >hole_max
+                too_big_mask = too_big[background_lab]
+                out[too_big_mask] = 0
+                too_small = component_sizes < hole_min
+                too_small_mask = too_small[background_lab]
+                out[too_small_mask] = 0
+                fill_out[zz,:,:] = out
+        else:
+            background_lab = label(~bw, connectivity=1)
+            fill_out = np.copy(background_lab)
+            component_sizes = np.bincount(background_lab.ravel())
+            too_big = component_sizes >hole_max
+            too_big_mask = too_big[background_lab]
+            fill_out[too_big_mask] = 0
+            too_small = component_sizes < hole_min
+            too_small_mask = too_small[background_lab]
+            fill_out[too_small_mask] = 0
+    else:
+        print('error')
+        return
+        
+    return np.logical_or(bw, fill_out)
 
 def topology_preserving_thinning(bw, min_thickness=1, thin=1):
     bw = bw>0

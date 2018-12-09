@@ -81,6 +81,6 @@ cd C:\Projects\aics-segmentation\lookup_table_demo
 jupyter notebook, choose anaconda installer.
 ```
 
-This will take you to your default browser (e.g., Chrome) and launch Jupyter Notebook App within your browser. Open "demo_RAB5.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
+This will take you to your default browser (e.g., Chrome) and launch Jupyter Notebook App within your browser. Open "demo_TNNI1.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
 
 

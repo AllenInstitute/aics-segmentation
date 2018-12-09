@@ -26,3 +26,13 @@ def dot_slice_by_slice(struct_img, log_sigma):
     for zz in range(struct_img.shape[0]):
         res[zz, :, :] = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img[zz, :, :], log_sigma)
     return res
+
+def dot_2d_slice_by_slice_wrapper(struct_img, s2_param):
+    bw = np.zeros(struct_img.shape, dtype=bool)
+    for fid in range(len(s2_param)):
+        log_sigma = s2_param[fid][0]
+        responce = np.zeros_like(struct_img)
+        for zz in range(struct_img.shape[0]):
+            responce[zz, :, :] = -1*(log_sigma**2)*ndi.filters.gaussian_laplace(struct_img[zz, :, :], log_sigma)
+        bw = np.logical_or(bw, responce>s2_param[fid][1])
+    return bw
