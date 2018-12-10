@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects, erosion, ball, dilation
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
+from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_3d
 from skimage.measure import label
 from skimage.filters import threshold_triangle, threshold_otsu

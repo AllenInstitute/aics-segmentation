@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from ..core.seg_dot import dot_3d, dot_slice_by_slice
 from skimage.measure import label
 from aicssegmentation.core.output_utils import save_segmentation, GJA1_output

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
+from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.vessel import vesselnessSliceBySlice
 from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt

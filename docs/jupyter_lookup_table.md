@@ -50,6 +50,8 @@ If you need to consistently segment more than a few images similar to the one yo
 
 For example, you have finalize your segmentation workflow for Rab-5A.
 
+### Basic steps
+
 1. duplicate the template file in `/aics-segmentation/aicssegmentation/structure_wrapper/seg_template.py` as `/aics-segmentation/aicssegmentation/structure_wrapper/seg_RAB5A.py`
 
 2. Open seg_RAB5A.py
@@ -70,3 +72,37 @@ For example, you have finalize your segmentation workflow for Rab-5A.
 cd /aics-segmentation/aicssegmentation/bin/
 ./run_toolkit.sh
 ```
+
+### Optional functions:
+
+#### OF1: By default, only the final segmentation output will be saved into the specified output path. There is an option for you to output intermediate results or anything is a customized way. To do this, you can
+
+1. Go to line 55 in /aicssegmentation/core/output_utils.py. Customize the function `template_output()`. All intermediate results are saved in `out_img_list` with their corresponding name in `out_name_list`. You simply select which variable to save using the corresponding default name or the name you prefer. 
+
+2. Rename `template_output()` into a specific name, like `RAB5_output()`.
+
+3. Go back to your `seg_RAB5A.py` 
+    * line 9, change `from aicssegmentation.core.output_utils import template_output` into your cutomized name `from aicssegmentation.core.output_utils import RAB5_output`
+    * line 69, change `elif output_type == 'TEMPLATE':` into a new name, e.g. `elif output_type == 'MyLab':`
+    * line 71, change `template_output( ... )` into your new customized function `RAB5_output( ... )`
+
+4. Then, before you run your script `./run_toolkit.sh`, make sure you set your `output_type` as your new name, e.g. `MyLab`.
+
+
+#### OF2: By defalt, your input image (orginal file, like .czi) will not be resized. But, when you process different images of the same intracellular structure and the images are of slighlty different resolution, you may need to first resize all the image into the same resolution as the images you tuned your parameters on. The reason is that parameters tuned on image of one resolution may yield different results on images of a very different resolution. 
+
+Case 1: Only xy resolution varies
+
+Go to `batch_pipeline.py` line 151-156, give your case a name and a standard resolution. Assuming you are dealing with images of super resolution with xy-resolution as 0.23 micron x 0.23 micron /pixel, then you may use 
+
+```python
+if args.struct_name.endswith('_SuperRes'):
+    standard_xy = 0.23
+```
+
+In this case, your structure name in `run_toolkit.sh` needs to be `'RAB5_SuperRes'`. (We treat `'RAB5'` and `'RAB5_SuperRes'` as two different tasks programaticaly.) Whenever your want to process an image, if `XY=0.23` in `run_toolkit.sh`, then the image will not be resized. Otherwise, for example, `XY=0.20`, the image will be first resized in xy dimention.
+
+Case 2: xyz resolution may all vary
+
+In this case, you need to modify line 37-39 in your `seg_template.py` to do resizing in all dimensions into a standard resolution. 
+

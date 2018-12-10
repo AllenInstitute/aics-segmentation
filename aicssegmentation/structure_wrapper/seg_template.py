@@ -6,7 +6,7 @@ from ..core.seg_dot import dot_3d
 from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
-from aicssegmentation.core.output_utils import save_segmentation, DSP_output
+from aicssegmentation.core.output_utils import template_output, save_segmentation
 
 
 def TEMPLATE_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -66,15 +66,9 @@ def TEMPLATE_HiPSC_Pipeline(struct_img, rescale_ratio, output_type, output_path,
     if output_type == 'default': 
         # the default final output
         save_segmentation(seg, False, output_path, fn)
-    elif output_type == 'AICS_pipeline':
-        # pre-defined output function for pipeline data (allen institute internal)
-        save_segmentation(seg, True, output_path, fn)
-    elif output_type == 'customize':
-        # the hook for passing in a customized output function
-        output_fun(out_img_list, out_name_list, output_path, fn)
-    else:
-        # the hook for other pre-defined RnD output functions (AICS internal)
-        DSP_output(out_img_list, out_name_list, output_type, output_path, fn)
+    elif output_type == 'TEMPLATE':
+        # the hook for pre-defined output functions
+        template_output(out_img_list, out_name_list, output_type, output_path, fn)
 
 
 

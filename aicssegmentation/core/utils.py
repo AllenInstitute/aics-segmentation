@@ -3,7 +3,7 @@ from skimage.morphology import medial_axis
 from scipy.ndimage import distance_transform_edt
 from skimage.morphology import erosion, ball
 import aicsimageio
-from skimage.measure import label
+from skimage.measure import label, regionprops
 
 def hole_filling(bw, hole_min, hole_max, fill_2d=True):
 
@@ -126,3 +126,44 @@ def sortbyabs(a, axis=0):
     index = list(np.ix_(*[np.arange(i) for i in a.shape]))
     index[axis] = np.abs(a).argsort(axis)
     return a[index]
+
+def get_middle_frame(struct_img_smooth, method='z'):
+
+    from skimage.filters import threshold_otsu
+
+    if method == 'intensity':
+        bw = struct_img_smooth>threshold_otsu(struct_img_smooth)
+        z_profile = np.zeros((bw.shape[0],),dtype=int)
+        for zz in range(bw.shape[0]):
+            z_profile[zz] = np.count_nonzero(bw[zz,:,:])
+        mid_frame = round(histogram_otsu(z_profile)*bw.shape[0]).astype(int)
+        
+    elif method == 'z':
+        mid_frame = struct_img_smooth.shape[0] // 2
+
+    else:
+        print('unsupported method')
+        quit()
+    
+    return mid_frame
+
+def get_3dseed_from_mid_frame(bw, stack_shape, mid_frame, hole_min, bg_seed = True):
+    from skimage.morphology import remove_small_objects
+    out = remove_small_objects(bw>0, hole_min)
+
+    out1 = label(out)
+
+    # build the seed for watershed
+    seed = np.zeros(stack_shape)
+    stat = regionprops(out1)
+    seed_count=0
+    for idx in range(len(stat)):
+        py, px = np.round(stat[idx].centroid)
+        seed_count+=1
+        seed[mid_frame,int(py),int(px)]=seed_count
+
+
+    if bg_seed:
+        seed[0,:,:]=seed_count+1
+
+    return seed
