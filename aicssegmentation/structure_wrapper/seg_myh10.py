@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from skimage.morphology import remove_small_objects
-from ..core.pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
+from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from ..core.vessel import vesselness3D
 from aicssegmentation.core.output_utils import save_segmentation, MYH10_output
 
@@ -38,7 +38,7 @@ def MYH10_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, 
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
 
     # smoothing 
-    structure_img_smooth = boundary_preserving_smoothing_3d(struct_img)
+    structure_img_smooth = edge_preserving_smoothing_3d(struct_img)
 
     out_img_list.append(structure_img_smooth.copy())
     out_name_list.append('im_smooth')
