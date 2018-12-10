@@ -58,7 +58,7 @@ For example, you have finalize your segmentation workflow for Rab-5A.
 
 3. Change the function name from `TEMPLATE_HiPSC_Pipeline()` to `RAB5A_HiPSC_Pipeline()` on line 12
 
-4. insert you parameters and functions at the placeholders (searching `#ADD-HERE` in the code). You can also check the other files under structure_wrapper to see examples.
+4. insert you parameters and functions at the placeholders (searching `#ADD-HERE` in the code). Meanwhile, make sure you `import` all the functions you want to use. You can check the other files under structure_wrapper to see examples.
 
 5. Save the file.
 
