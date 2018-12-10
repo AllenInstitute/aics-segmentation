@@ -2,7 +2,7 @@
 
 We recommend that users start by
 
-Identifying a structure in the lookup table that looks most similar to the segmentation task that you are faced with. Once you have identified this structure, open the correspoinding Jupyter Notebook and follow the instructions in the notebook to tune the workflow for your particular task. Finally, after finalizing the algorithms and parameters in the workflow, modify batch_pipeline.py to batch process all data (file by file or folder by folder).
+Identifying a structure in the [lookup table](toolkit_paper_lookup_table_20181206.pdf) that looks most similar to the segmentation task that you are faced with. Once you have identified this structure, open the correspoinding Jupyter Notebook and follow the instructions in the notebook to tune the workflow for your particular task. Finally, after finalizing the algorithms and parameters in the workflow, modify batch_pipeline.py to batch process all data (file by file or folder by folder).
 
 
 ## Step 1: Find the entry in the lookup table with most similar morphology to your data
