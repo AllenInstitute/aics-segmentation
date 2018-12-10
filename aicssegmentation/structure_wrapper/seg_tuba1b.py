@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from ..core.vessel  import vesselness3D
-from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
+from ..core.pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
 from aicssegmentation.core.output_utils import save_segmentation, TUBA1B_output
 

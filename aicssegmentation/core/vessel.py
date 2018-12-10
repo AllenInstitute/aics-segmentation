@@ -37,17 +37,25 @@ def filament_3d_wrapper(struct_img, f3_param):
 
 def filament_2d_wrapper(struct_img, f2_param):
     bw = np.zeros(struct_img.shape, dtype=bool)
-    mip = np.amax(struct_img, axis=0)
-    for fid in range(len(f2_param)):
-        sigma = f2_param[fid][0]
-  
-        res = np.zeros_like(struct_img)
-        for zz in range(struct_img.shape[0]):
-            tmp = np.concatenate((struct_img[zz, :, :], mip), axis=1)
-            eigenvalues = absolute_3d_hessian_eigenvalues(tmp, sigma=sigma, scale=True, whiteonblack=True)
+
+    if len(struct_img.shape)==2:
+        for fid in range(len(f2_param)):
+            sigma = f2_param[fid][0]
+            eigenvalues = absolute_3d_hessian_eigenvalues(struct_img, sigma=sigma, scale=True, whiteonblack=True)
             responce = compute_vesselness2D(eigenvalues[1], tau=1)
-            res[zz, :, :struct_img.shape[2]-3] = responce[:, :struct_img.shape[2]-3]
-        bw = np.logical_or(bw, res>f2_param[fid][1])
+            bw = np.logical_or(bw, responce > f2_param[fid][1])
+    elif len(struct_img.shape)==3:
+        mip = np.amax(struct_img, axis=0)
+        for fid in range(len(f2_param)):
+            sigma = f2_param[fid][0]
+    
+            res = np.zeros_like(struct_img)
+            for zz in range(struct_img.shape[0]):
+                tmp = np.concatenate((struct_img[zz, :, :], mip), axis=1)
+                eigenvalues = absolute_3d_hessian_eigenvalues(tmp, sigma=sigma, scale=True, whiteonblack=True)
+                responce = compute_vesselness2D(eigenvalues[1], tau=1)
+                res[zz, :, :struct_img.shape[2]-3] = responce[:, :struct_img.shape[2]-3]
+            bw = np.logical_or(bw, res>f2_param[fid][1])
     return bw
 
 

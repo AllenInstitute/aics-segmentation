@@ -4,7 +4,7 @@ from skimage.morphology import remove_small_objects
 from skimage.measure import label
 from ..core.vessel import vesselnessSliceBySlice
 from ..core.seg_dot import dot_slice_by_slice
-from ..pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
+from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from aicssegmentation.core.output_utils import save_segmentation, LAMP1_output
 
 

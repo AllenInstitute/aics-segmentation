@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from ..core.vessel import vesselnessSliceBySlice
-from ..pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
+from ..core.pre_processing_utils import intensity_normalization, boundary_preserving_smoothing_3d
 from scipy import ndimage as ndi
 from skimage.morphology import remove_small_objects
 from aicssegmentation.core.output_utils import save_segmentation, SEC61B_output

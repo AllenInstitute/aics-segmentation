@@ -52,6 +52,11 @@ def paperFigure(out_img_list, out_name_list, output_type, output_path, fn):
     out_name_list[-1] = 'struct_segmentation' # use default name
     output_hook(out_img_list, out_name_list, out_flag, output_path, fn)
 
+def template_output(out_img_list, out_name_list, output_type, output_path, fn):
+
+    out_flag[-1] = True # also output the last one (always the final result)
+    out_name_list[-1] = 'struct_segmentation' # use default name
+    output_hook(out_img_list, out_name_list, out_flag, output_path, fn)
 
 def FBL_output(out_img_list, out_name_list, output_type, output_path, fn):
     if output_type == 'AICS_RnD':
