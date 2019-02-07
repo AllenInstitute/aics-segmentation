@@ -7,6 +7,7 @@ from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
 from aicssegmentation.core.output_utils import save_segmentation, RAB5A_output
+from aicssegmentation.core.utils import hole_filling
 
 def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
@@ -14,12 +15,16 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [6000]
+    intensity_norm_param = [1000]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.02
-    minArea = 5
+    dot_3d_cutoff = 0.03
+
+    hole_min = 0
+    hole_max= 81
+
+    minArea = 3
     ##########################################################################
 
     out_img_list = []
@@ -53,11 +58,20 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     # step 1: LOG 3d 
     response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw = response > dot_3d_cutoff
-    bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
+ 
+    bw_filled = hole_filling(bw, hole_min, hole_max, True)
 
-    out_img_list.append(bw.copy())
-    out_name_list.append('interm_mask')
+    seg = remove_small_objects(bw_filled, min_size=minArea, connectivity=1, in_place=False)
 
+    # output
+    seg = seg>0
+    seg = seg.astype(np.uint8)
+    seg[seg>0]=255
+    
+    out_img_list.append(seg.copy())
+    out_name_list.append('bw_final')
+
+    '''
     # step 2: 'local_maxi + watershed' for cell cutting
     local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=2, indices=False)
 
@@ -79,6 +93,7 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
 
     out_img_list.append(seg.copy())
     out_name_list.append('bw_final')
+    '''
 
     if output_type == 'default': 
         # the default final output
