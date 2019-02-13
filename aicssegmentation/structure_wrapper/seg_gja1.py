@@ -5,6 +5,7 @@ from ..core.pre_processing_utils import intensity_normalization, image_smoothing
 from ..core.seg_dot import dot_3d, dot_slice_by_slice
 from skimage.measure import label
 from aicssegmentation.core.output_utils import save_segmentation, GJA1_output
+from aicsimageprocessing import resize
 
 def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
@@ -36,7 +37,7 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, 
 
     # rescale if needed
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
@@ -78,9 +79,8 @@ def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, 
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        # the hook for other pre-defined RnD output functions (AICS internal)
-        GJA1_output(out_img_list, out_name_list, output_type, output_path, fn)
-
-
-
+        # the hook for pre-defined RnD output functions (AICS internal)
+        img_list, name_list = GJA1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        if output_type == 'QCB':
+            return img_list, name_list
 

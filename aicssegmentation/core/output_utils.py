@@ -1,5 +1,6 @@
 import aicsimageio
 import numpy as np
+import os
 
 
 
@@ -34,10 +35,10 @@ def output_hook(im, names, out_flag, output_path, fn):
                 segmentation_type = names[i]
                 bw = im[i].astype(np.uint8)
                 bw[bw>0]=255
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_bw_' + segmentation_type[3:] + '.tiff')))
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(output_path + os.sep + fn + '_bw_' + segmentation_type[3:] + '.tiff')
                 writer.save(bw)
             else:
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_' + names[i] + '.tiff')))
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(output_path + os.sep + fn + '_' + names[i] + '.tiff')
                 writer.save(im[i])
 
 def paperFigure(out_img_list, out_name_list, output_type, output_path, fn):
@@ -175,8 +176,20 @@ def TUBA1B_output(out_img_list, out_name_list, output_type, output_path, fn):
 
 def TJP1_output(out_img_list, out_name_list, output_type, output_path, fn):
 
-    if output_type == 'AICS_RnD':
-        paperFigure(out_img_list, out_name_list, output_type, output_path, fn)
+    #if output_type == 'AICS_RnD':
+    #    paperFigure(out_img_list, out_name_list, output_type, output_path, fn)
+    out_flag = []
+    for i in range(len(out_name_list)):
+        out_flag.append(False)
+
+    out_flag[-1] = True # also output the last one (always the final result)
+    out_name_list[-1] = 'struct_segmentation' # use default name
+    output_hook(out_img_list, out_name_list, out_flag, output_path, fn)
+
+    img_list = [out_img_list[-1]]
+    name_list = [out_name_list[-1]]
+
+    return img_list, name_list
 
 def CTNNB1_output(out_img_list, out_name_list, output_type, output_path, fn):
 

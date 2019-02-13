@@ -7,6 +7,7 @@ from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
 from scipy.ndimage.morphology import binary_fill_holes
 from aicssegmentation.core.output_utils import save_segmentation, NPM1_output
+from aicsimageprocessing import resize
 
 def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, output_func=None):
     ##########################################################################
@@ -38,7 +39,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
 
     # rescale if needed
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
@@ -117,5 +118,7 @@ def NPM1_HiPSC_Pipeline(struct_img,rescale_ratio,output_type, output_path, fn, o
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        # the hook for other pre-defined RnD output functions (AICS internal)
-        NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        # the hook for pre-defined RnD output functions (AICS internal)
+        img_list, name_list = NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        if output_type == 'QCB':
+            return img_list, name_list

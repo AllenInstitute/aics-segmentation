@@ -3,10 +3,11 @@ import os
 from ..core.vessel  import vesselness3D
 from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
-from aicssegmentation.core.output_utils import save_segmentation
+from aicssegmentation.core.output_utils import save_segmentation, PXN_output
+from aicsimageprocessing import resize
 
 
-def Paxillin_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def PXN_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     ##########################################################################
     # PARAMETERS:
@@ -34,7 +35,7 @@ def Paxillin_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
 
     # rescale if needed
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
 
     # smoothing with boundary preserving smoothing
@@ -98,3 +99,8 @@ def Paxillin_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
     elif output_type == 'customize':
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
+    else:
+        # the hook for pre-defined RnD output functions (AICS internal)
+        img_list, name_list = PXN_output(out_img_list, out_name_list, output_type, output_path, fn)
+        if output_type == 'QCB':
+            return img_list, name_list
