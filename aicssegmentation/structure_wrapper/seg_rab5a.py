@@ -7,6 +7,8 @@ from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
 from aicssegmentation.core.output_utils import save_segmentation, RAB5A_output
+from aicssegmentation.core.utils import hole_filling
+from aicsimageprocessing import resize
 
 def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
@@ -14,12 +16,16 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [6000]
+    intensity_norm_param = [1000]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.02
-    minArea = 5
+    dot_3d_cutoff = 0.03
+
+    hole_min = 0
+    hole_max= 81
+
+    minArea = 3
     ##########################################################################
 
     out_img_list = []
@@ -36,7 +42,7 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     
     # rescale if needed
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
@@ -53,30 +59,16 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     # step 1: LOG 3d 
     response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw = response > dot_3d_cutoff
-    bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
-
-    out_img_list.append(bw.copy())
-    out_name_list.append('interm_mask')
-
-    # step 2: 'local_maxi + watershed' for cell cutting
-    local_maxi = peak_local_max(struct_img,labels=label(bw), min_distance=2, indices=False)
-
-    out_img_list.append(local_maxi.copy())
-    out_name_list.append('interm_local_max')
-
-    distance = distance_transform_edt(bw)
-    im_watershed = watershed(-distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
-
-    ###################
-    # POST-PROCESSING
-    ###################
-    seg = remove_small_objects(im_watershed, min_size=minArea, connectivity=1, in_place=False)
+ 
+    # step 2: fill holes and remove small objects
+    bw_filled = hole_filling(bw, hole_min, hole_max, True)
+    seg = remove_small_objects(bw_filled, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
-
+    
     out_img_list.append(seg.copy())
     out_name_list.append('bw_final')
 
@@ -90,7 +82,8 @@ def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        # the hook for other pre-defined RnD output functions (AICS internal)
-        RAB5A_output(out_img_list, out_name_list, output_type, output_path, fn)
-
+        # the hook for pre-defined RnD output functions (AICS internal)
+        img_list, name_list = RAB5A_output(out_img_list, out_name_list, output_type, output_path, fn)
+        if output_type == 'QCB':
+            return img_list, name_list
 

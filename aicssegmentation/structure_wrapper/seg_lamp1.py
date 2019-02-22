@@ -6,6 +6,7 @@ from ..core.vessel import vesselnessSliceBySlice
 from ..core.seg_dot import dot_slice_by_slice
 from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from aicssegmentation.core.output_utils import save_segmentation, LAMP1_output
+from aicsimageprocessing import resize
 
 
 def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -44,7 +45,7 @@ def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
     out_name_list.append('im_norm')
 
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
         gaussian_smoothing_truncate_range = gaussian_smoothing_truncate_range * rescale_ratio
 
@@ -111,9 +112,10 @@ def LAMP1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
     else:
-        # the hook for other pre-defined RnD output functions (AICS internal)
-        LAMP1_output(out_img_list, out_name_list, output_type, output_path, fn)
-
+        # the hook for pre-defined RnD output functions (AICS internal)
+        img_list, name_list = LAMP1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        if output_type == 'QCB':
+            return img_list, name_list
 
 
 

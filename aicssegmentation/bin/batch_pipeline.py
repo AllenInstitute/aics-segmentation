@@ -18,28 +18,8 @@ PER_IMAGE = 'per_img'
 PER_DIR = 'per_dir'
 
 STRUCTURE_MAPPING = {
+    # only keep this file as a template. the actual file should be in a seperate repository
     'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},             # version 1.1.1
-    'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},    # version 1.1.2
-    'ST6GAL1': {'module': 'aicssegmentation.structure_wrapper.seg_st6gal1', 'class': 'ST6GAL1_HiPSC_Pipeline'},  # version 1.2.0
-    'TUBA1B': {'module': 'aicssegmentation.structure_wrapper.seg_tuba1b', 'class': 'TUBA1B_HiPSC_Pipeline'},    # version 1.1.2
-    'TOMM20': {'module': 'aicssegmentation.structure_wrapper.seg_tomm20', 'class': 'TOMM20_HiPSC_Pipeline'},    # version 1.1.2
-    'CETN2': {'module': 'aicssegmentation.structure_wrapper.seg_cetn2', 'class': 'CETN2_HiPSC_Pipeline'},   # version 1.1.0
-    'FBL': {'module': 'aicssegmentation.structure_wrapper.seg_fbl', 'class': 'FBL_HiPSC_Pipeline'},         # version 1.1.3
-    'ACTN1': {'module': 'aicssegmentation.structure_wrapper.seg_actn1', 'class': 'ACTN1_HiPSC_Pipeline'},   # version 1.1.3  
-    'TJP1': {'module': 'aicssegmentation.structure_wrapper.seg_tjp1', 'class': 'TJP1_HiPSC_Pipeline'},
-    'ACTB': {'module': 'aicssegmentation.structure_wrapper.seg_actb', 'class': 'ACTB_HiPSC_Pipeline'},
-    'MYH10': {'module': 'aicssegmentation.structure_wrapper.seg_myh10', 'class': 'MYH10_HiPSC_Pipeline'},
-    'CTNNB1': {'module': 'aicssegmentation.structure_wrapper.seg_ctnnb1', 'class': 'CTNNB1_HiPSC_Pipeline'},
-    'GJA1': {'module': 'aicssegmentation.structure_wrapper.seg_gja1', 'class': 'GJA1_HiPSC_Pipeline'},
-    'NPM1': {'module': 'aicssegmentation.structure_wrapper.seg_npm1', 'class': 'NPM1_HiPSC_Pipeline'},
-    'LAMP1': {'module': 'aicssegmentation.structure_wrapper.seg_lamp1', 'class': 'LAMP1_HiPSC_Pipeline'},
-    'RAB5A': {'module': 'aicssegmentation.structure_wrapper.seg_rab5a', 'class': 'RAB5A_HiPSC_Pipeline'},
-    'SLC25A17': {'module': 'aicssegmentation.structure_wrapper.seg_slc25a17', 'class': 'SLC25A17_HiPSC_Pipeline'},
-    'TNNI1_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_tnni1', 'class': 'TNNI1_Cardio_Pipeline'},
-    'TTN_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_ttn', 'class': 'TTN_Cardio_Pipeline'},
-    'ATP2A2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_atp2a2', 'class': 'ATP2A2_Cardio_Pipeline'},
-    'MYL7_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_myl7', 'class': 'MYL7_Cardio_Pipeline'},
-    'ACTN2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_actn2', 'class': 'ACTN2_Cardio_Pipeline'},
     'TEMPLATE': {'module': 'aicssegmentation.structure_wrapper.seg_template', 'class': 'TEMPLATE_Cardio_Pipeline'}
 }
 
