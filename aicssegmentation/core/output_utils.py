@@ -1,8 +1,8 @@
-import aicsimageio
-import numpy as np
 import os
 
+import numpy as np
 
+import aicsimageio
 
 def save_segmentation(bw, contour_flag, output_path, fn):
 
