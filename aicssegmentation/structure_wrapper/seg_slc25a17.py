@@ -16,13 +16,11 @@ def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [1000]
+    intensity_norm_param = [2, 36]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_3d_sigma = 1
-    dot_3d_cutoff = 0.03 #0.03 #0.04
-    dot_3d_dim = 0.5
-    dot_3d_dim_cutoff = 0.0875
+    dot_3d_cutoff = 0.045 #0.03 #0.04
     minArea = 3 #5
     ##########################################################################
 
@@ -58,20 +56,6 @@ def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
     response = dot_3d(structure_img_smooth, log_sigma=dot_3d_sigma)
     bw = response > dot_3d_cutoff
 
-    new_img = structure_img_smooth.copy()
-    new_img[bw] = structure_img_smooth.min()
-
-    response_small = dot_3d(new_img, log_sigma=dot_3d_dim)
-    label_small = label(response_small > dot_3d_dim_cutoff)
-
-    cid = np.unique(label_small[dilation(bw>0, selem=ball(1))])
-    for ii in range(len(cid)):
-        idx = cid[ii]
-        if idx>0:
-            label_small[label_small==idx]=0
-    
-    bw[label_small>0]=1
-
     bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     out_img_list.append(bw.copy())
@@ -90,7 +74,11 @@ def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
     # POST-PROCESSING
     ###################
     seg = remove_small_objects(im_watershed, min_size=minArea, connectivity=1, in_place=False)
-    
+
+    ###### HACK: Only for 2019 April Release #####
+    if np.count_nonzero(seg>0)<50000:
+        print('FLAG: please check the meta data of the original CZI for QC')
+        
     # output
     seg = seg>0
     seg = seg.astype(np.uint8)
