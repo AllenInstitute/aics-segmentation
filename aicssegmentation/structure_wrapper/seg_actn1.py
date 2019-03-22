@@ -74,7 +74,8 @@ def ACTN1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn,
         save_segmentation(seg, True, output_path, fn)
     elif output_type == 'customize':
         # the hook for passing in a customized output function
-        output_fun(out_img_list, out_name_list, output_path, fn)
+        # output_fun(out_img_list, out_name_list, output_path, fn)
+        print('please provide custom output function')
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = ACTN1_output(out_img_list, out_name_list, output_type, output_path, fn)

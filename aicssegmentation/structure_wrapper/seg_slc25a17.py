@@ -68,7 +68,7 @@ def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
     out_name_list.append('interm_local_max')
 
     distance = distance_transform_edt(bw)
-    im_watershed = watershed(-distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
+    im_watershed = watershed(-1*distance, label(dilation(local_maxi, selem=ball(1))), mask=bw, watershed_line=True)
 
     ###################
     # POST-PROCESSING
@@ -95,7 +95,8 @@ def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, 
         save_segmentation(seg, True, output_path, fn)
     elif output_type == 'customize':
         # the hook for passing in a customized output function
-        output_fun(out_img_list, out_name_list, output_path, fn)
+        #output_fun(out_img_list, out_name_list, output_path, fn)
+        print('please provide custom output function')
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = SLC25A17_output(out_img_list, out_name_list, output_type, output_path, fn)
