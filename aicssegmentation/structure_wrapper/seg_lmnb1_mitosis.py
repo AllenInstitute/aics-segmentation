@@ -1,24 +1,29 @@
 import numpy as np
-import os
+
+# package for io 
+from aicsimageio import AICSImage, omeTifWriter                            
+
+# function for core algorithm
+from aicssegmentation.core.vessel import filament_2d_wrapper
+from aicssegmentation.core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
+from aicssegmentation.core.utils import get_middle_frame, hole_filling, get_3dseed_from_mid_frame
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
-from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
-from ..core.seg_dot import dot_3d
-from skimage.feature import peak_local_max
-from scipy.ndimage import distance_transform_edt
-from skimage.measure import label
-from aicssegmentation.core.output_utils import  save_segmentation
+from skimage.segmentation import find_boundaries
+from aicssegmentation.core.output_utils import save_segmentation
+from aicsimageprocessing import resize
 
 
-def Workflow_template(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_lmnb1_mitosis(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    # ADD you parameters here
-    intensity_norm_param = []
-    minArea = 0
-    #ADD-HERE
+    intensity_norm_param = [4000]
+    gaussian_smoothing_sigma = 1
+    gaussian_smoothing_truncate_range = 3.0
+    f2_param = [[0.5, 0.01]]
+    minArea = 5
     ##########################################################################
 
     out_img_list = []
@@ -35,11 +40,11 @@ def Workflow_template(struct_img, rescale_ratio, output_type, output_path, fn, o
     
     # rescale if needed
     if rescale_ratio>0:
-        struct_img = processing.resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
+        struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
         struct_img = (struct_img - struct_img.min() + 1e-8)/(struct_img.max() - struct_img.min() + 1e-8)
 
-    # smoothing with gaussian filter
-    structure_img_smooth = ADD_SMOOTHING_FUNCTION_HERE #ADD-HERE
+    # smoothing with boundary preserving smoothing
+    structure_img_smooth = image_smoothing_gaussian_3d(struct_img, sigma=gaussian_smoothing_sigma, truncate_range=gaussian_smoothing_truncate_range)
 
     out_img_list.append(structure_img_smooth.copy())
     out_name_list.append('im_smooth')
@@ -48,15 +53,16 @@ def Workflow_template(struct_img, rescale_ratio, output_type, output_path, fn, o
     # core algorithm
     ###################
 
-    bw = ADD_CORE_ALGORITHMS_HERE #ADD-HERE
-
+    # 2d filament filter on the middle frame 
+    bw = filament_2d_wrapper(structure_img_smooth, f2_param)
+    
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw, min_size=minArea, connectivity=1, in_place=False)
+    bw = remove_small_objects(bw>0, min_size=minArea, connectivity=1, in_place=False)
 
     # output
-    seg = seg>0
+    seg = bw>0
     seg = seg.astype(np.uint8)
     seg[seg>0]=255
 
@@ -69,6 +75,3 @@ def Workflow_template(struct_img, rescale_ratio, output_type, output_path, fn, o
     else:
         print('your can implement your output hook here, but not yet')
         quit()
-
-
-

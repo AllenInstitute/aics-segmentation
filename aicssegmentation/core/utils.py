@@ -152,18 +152,18 @@ def get_3dseed_from_mid_frame(bw, stack_shape, mid_frame, hole_min, bg_seed = Tr
     out = remove_small_objects(bw>0, hole_min)
 
     out1 = label(out)
-
+    stat = regionprops(out1)
+    
     # build the seed for watershed
     seed = np.zeros(stack_shape)
-    stat = regionprops(out1)
     seed_count=0
+    if bg_seed:
+        seed[0,:,:] = 1
+        seed_count += 1
+
     for idx in range(len(stat)):
         py, px = np.round(stat[idx].centroid)
         seed_count+=1
         seed[mid_frame,int(py),int(px)]=seed_count
-
-
-    if bg_seed:
-        seed[0,:,:]=seed_count+1
 
     return seed
