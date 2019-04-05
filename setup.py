@@ -47,7 +47,7 @@ setup(name=PACKAGE_NAME,
       packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
       entry_points={
           "console_scripts": [
-              "batch_pipeline={}.bin.batch_pipeline:main".format(PACKAGE_NAME)
+              "batch_processing={}.bin.batch_processing:main".format(PACKAGE_NAME)
           ]
       },
       install_requires=[
