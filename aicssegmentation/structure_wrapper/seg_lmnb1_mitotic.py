@@ -13,7 +13,7 @@ from aicssegmentation.core.output_utils import save_segmentation
 from aicsimageprocessing import resize
 
 
-def Workflow_lmnb1_mitosis(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_lmnb1_mitotic(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
