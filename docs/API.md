@@ -3,12 +3,25 @@
 List of functions:
 * Preprocessing:
     * [`intensity_normalization`](#intensity_norm)
-    * `suggest_normalization_param`
-    * `image_smoothing_gaussian_3d`
-    * `image_smoothing_gaussian_slice_by_slice`
-    * `edge_preserving_smoothing_3d`
+    * [`image_smoothing_gaussian_3d`](#gaussian_3d)
+    * [`image_smoothing_gaussian_slice_by_slice`](#gaussian_2d)
+    * [`edge_preserving_smoothing_3d`](#es)
 * Core segmentation algorithms:
-
+    * [`filament_3d_wrapper`](#f2)
+    * [`filament_3d_wrapper`](#f3)
+    * [`dot_2d_slice_by_slice_wrapper`](#s2)
+    * [`dot_3d_wrapper`](#s3)
+    * [`MO`](#MO)
+    * [`Watershed`](#watershed)
+* Postprocessing:
+    * [`remove_small_objects`](#remove_small_objects)
+    * [`hole_filling`](#hole_filling)
+    * [`topology_preserving_thinning`](#tpt)
+* Auxillary functions:
+    * [`suggest_normalization_param`](#suggest_normalization_param)
+    * [`get_middle_frame`](#get_middle_frame)
+    * [`get_3dseed_from_mid_frame`](#seed)
+    * [`find_boundaries`](#bd)
 
 
 ## Preprocessing 
@@ -312,3 +325,15 @@ seed = get_3dseed_from_mid_frame(bw2d, shape_3d, frame_index, area_min, bg_seed)
 3. frame_index: the index of where `bw2d` is from the whole z-stack
 4. area_min: any connected component in `bw2d` with size smaller than `area_min` will be excluded from seed image generation
 5. bg_seed: `bg_seed=True` will add a background seed at the first frame (z=0).
+
+---
+<a name='bd'>`find_boundaries`</a>
+
+find the boundaries of all connected components in the segmentation
+
+```python
+from skimage.segmentation import find_boundaries
+seg_boundary = find_boundaries(seg_filled, connectivity=1, mode='thick')
+```
+
+see [documentation on skimage](https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.find_boundaries)
