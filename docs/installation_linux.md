@@ -7,10 +7,10 @@
 
 [What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
 
-#### 1. [Install conda on Linux](https://conda.io/docs/user-guide/install/windows.html?highlight=conda), choose anaconda installer.
+#### 1. [Install conda on Linux](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html), choose anaconda installer.
 
 
-#### 2. [Start conda on Linux](https://conda.io/docs/user-guide/getting-started.html#starting-conda)
+#### 2. [Start conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda)
 
 All commands below are typed into Anaconda Prompt window
 
@@ -23,8 +23,10 @@ conda create -n segmentation python=3.6
 #### 4. Activate your new conda environment "segmentation"
 
 ``` bash
-source activate segmentation
+conda activate segmentation
 ```
+
+(For older version conda, the command is `source activate segmentation`.)
 
 #### 5. Now, you are in "segmentation" environment. You can install the package following the steps below.
 
@@ -55,7 +57,13 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 cd ~/Projects/aics-segmentation
 pip install numpy
 pip install -e .
-pip install itkwidgets
+pip install itkwidgets==0.14.0
+```
+
+For Jupyter Lab users, the itk viewer requires additionally run:
+
+```
+jupyter labextension install @jupyter-widgets/jupyterlab-manager itk-jupyter-widgets
 ```
 
 ### Option 2: Install from PyPi (useful when running on a server/cluster)
