@@ -2,7 +2,7 @@
 
 List of functions:
 * Preprocessing:
-    * `intensity_normalization`
+    * [`intensity_normalization`](#intensity_norm)
     * `suggest_normalization_param`
     * `image_smoothing_gaussian_3d`
     * `image_smoothing_gaussian_slice_by_slice`
