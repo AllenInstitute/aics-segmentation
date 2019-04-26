@@ -65,7 +65,7 @@ def Workflow_lmnb1_interphase(struct_img,rescale_ratio, output_type, output_path
     seg_filled = watershed(struct_img, seed.astype(int), watershed_line=True)>1 # in watershed result, 1 is for background
 
     # get the actual shell
-    seg = find_boundaries(seg_filled, connectivity=1, mode='inner')
+    seg = find_boundaries(seg_filled, connectivity=1, mode='thick')
 
     # output
     seg = seg.astype(np.uint8)
