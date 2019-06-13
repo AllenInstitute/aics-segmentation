@@ -10,7 +10,7 @@ from aicssegmentation.core.output_utils import save_segmentation, RAB5A_output
 from aicssegmentation.core.utils import hole_filling
 from aicsimageprocessing import resize
 
-def RAB5A_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_rab5a(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

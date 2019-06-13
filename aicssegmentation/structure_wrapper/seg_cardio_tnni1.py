@@ -6,7 +6,7 @@ from skimage.morphology import remove_small_objects
 from aicssegmentation.core.output_utils import save_segmentation, TNNI1_Cardio_output
 
 
-def TNNI1_Cardio_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_cardio_tnni1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

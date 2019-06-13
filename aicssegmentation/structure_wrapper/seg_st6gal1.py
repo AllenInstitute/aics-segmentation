@@ -9,7 +9,7 @@ from aicssegmentation.core.utils import topology_preserving_thinning
 from aicssegmentation.core.output_utils import save_segmentation, ST6GAL1_output
 from aicsimageprocessing import resize
 
-def ST6GAL1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_st6gal1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

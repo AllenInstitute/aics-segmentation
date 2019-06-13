@@ -17,6 +17,7 @@ import aicsimageio
 PER_IMAGE = 'per_img'
 PER_DIR = 'per_dir'
 
+'''
 STRUCTURE_MAPPING = {
     'DSP': {'module': 'aicssegmentation.structure_wrapper.seg_dsp', 'class': 'DSP_HiPSC_Pipeline'},             # version 1.1.1
     'SEC61B': {'module': 'aicssegmentation.structure_wrapper.seg_sec61b', 'class': 'SEC61B_HiPSC_Pipeline'},    # version 1.1.2
@@ -42,6 +43,7 @@ STRUCTURE_MAPPING = {
     'MYL7_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_myl7', 'class': 'MYL7_Cardio_Pipeline'},
     'ACTN2_Cardio': {'module': 'aicssegmentation.structure_wrapper.seg_cardio_actn2', 'class': 'ACTN2_Cardio_Pipeline'}
 }
+'''
 
 
 log = logging.getLogger()
@@ -103,9 +105,9 @@ class Args(object):
         # Add arguments
         p.add_argument('--d', '--debug', action='store_true', dest='debug',
                        help='If set debug log output is enabled')
-        p.add_argument('--struct_name', dest='struct_name',
-                       help='structure name')
-        p.add_argument('--workflow_name', dest='workflow_name', default='ignore',
+        p.add_argument('--struct_name', dest='struct_name', default='skip',
+                       help='Legacy Option for backward compatibility] use workflow_name instead')
+        p.add_argument('--workflow_name', dest='workflow_name', default='template',
                        help='the name of your workflow')        
         p.add_argument('--struct_ch', default=3, type=int, dest='struct_ch',
                        help='the index of the structure channel of the image file, default is 3')
@@ -162,27 +164,20 @@ class Executor(object):
 
     def execute(self, args):
 
-        if not args.workflow_name == 'ignore':
-            # overwrite struct_name
-            args.struct_name = args.workflow_name 
-
-        if args.struct_name not in STRUCTURE_MAPPING.keys():
-            # this is not a off-the-shelf structure, will interpreted differently
-            try:
-                module_name = 'aicssegmentation.structure_wrapper.seg_' + args.struct_name
-                seg_module = importlib.import_module(module_name)
-                class_name = 'Workflow_'+ args.struct_name
-                SegModule = getattr(seg_module, class_name)
-            except:
-                print('{} structure not found'.format(args.struct_name))
-                sys.exit(1)
-        else:
-            # Pull module info for this structure
-            seg_module_info = STRUCTURE_MAPPING[args.struct_name]
-            # Import the module specified for that structure
-            seg_module = importlib.import_module(seg_module_info['module'])
-            # Pull out the segmentation class from that module
-            SegModule = getattr(seg_module, seg_module_info['class'])
+        if not args.struct_name == 'skip':
+            if not args.workflow_name == 'template':
+                print('only use either workflow_name or struct_name, should use both.')
+                quit()
+            args.workflow_name = args.struct_name
+        
+        try:
+            module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
+            seg_module = importlib.import_module(module_name)
+            class_name = 'Workflow_'+ args.workflow_name
+            SegModule = getattr(seg_module, class_name)
+        except:
+            print('{} structure not found'.format(args.workflow_name))
+            sys.exit(1)
 
         output_path = pathlib.Path(args.output_dir)
 

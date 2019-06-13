@@ -5,7 +5,7 @@ from ..core.pre_processing_utils import intensity_normalization, edge_preserving
 from ..core.vessel import vesselness3D
 from aicssegmentation.core.output_utils import save_segmentation, ACTN2_Cardio_output
 
-def ACTN2_Cardio_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_cardio_actn2(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

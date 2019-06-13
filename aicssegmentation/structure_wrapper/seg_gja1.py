@@ -7,7 +7,7 @@ from skimage.measure import label
 from aicssegmentation.core.output_utils import save_segmentation, GJA1_output
 from aicsimageprocessing import resize
 
-def GJA1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_gja1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     ##########################################################################
     # PARAMETERS:

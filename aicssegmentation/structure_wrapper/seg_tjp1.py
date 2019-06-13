@@ -7,7 +7,7 @@ from aicssegmentation.core.output_utils import save_segmentation, TJP1_output
 from aicsimageprocessing import resize
 
 
-def TJP1_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_tjp1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

@@ -7,7 +7,7 @@ from skimage.morphology import remove_small_objects
 from aicssegmentation.core.output_utils import save_segmentation, SEC61B_output
 from aicsimageprocessing import resize
 
-def SEC61B_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_sec61b(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

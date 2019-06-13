@@ -10,7 +10,7 @@ from aicssegmentation.core.output_utils import save_segmentation, SLC25A17_outpu
 from aicsimageprocessing import resize
 
 
-def SLC25A17_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_slc25a17(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure

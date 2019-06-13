@@ -7,7 +7,7 @@ from aicssegmentation.core.output_utils import save_segmentation, PXN_output
 from aicsimageprocessing import resize
 
 
-def PXN_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_pxn(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     ##########################################################################
     # PARAMETERS:

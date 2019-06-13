@@ -7,7 +7,7 @@ from aicssegmentation.core.output_utils import save_segmentation, TUBA1B_output
 from aicsimageprocessing import resize
 
 
-def TUBA1B_HiPSC_Pipeline(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_tuba1b(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     ##########################################################################
     # PARAMETERS:
