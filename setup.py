@@ -25,10 +25,12 @@ lint_deps = ['flake8']
 interactive_dev_deps = [
     'matplotlib>=2.2.3',
     'jupyter',
-    'itkwidgets==0.12.2',
+    'itkwidgets',
     'ipython==7.0.1',
     'ipywidgets==7.4.1'
 ]
+# may need itkwidgets==0.12.2. if viewer keeps crashing
+
 all_deps = [*test_deps, *lint_deps, *interactive_dev_deps]
 extras = {
     'test_group': test_deps,
