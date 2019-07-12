@@ -57,7 +57,7 @@ setup(name=PACKAGE_NAME,
           'scipy>=1.1.0',
           'scikit-image>=0.14.0',
           'pandas>=0.23.4',
-          'aicsimageio>=0.4.3',
+          'aicsimageio>=0.4.3,<3.0.0',
           'aicsimageprocessing',
           'numba>=0.40.0',
           'itk'
