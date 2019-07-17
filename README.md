@@ -3,7 +3,7 @@
 The Allen Cell Structure Segmenter is a Python-based open source toolkit developed for 3D segmentation of intracellular structures in fluorescence microscope images, developed at the Allen Institute for Cell Science. This toolkit consists of two complementary elements, a classic image segmentation workflow with a restricted set of algorithms and parameters and an iterative deep learning segmentation workflow. We created a collection of 20 classic image segmentation workflows based on 20 distinct and representative intracellular structure localization patterns as a lookup table reference and starting point for users. The iterative deep learning workflow can take over when the classic segmentation workflow is insufficient. Two straightforward human-in-the-loop curation strategies convert a set of classic image segmentation workflow results into a set of 3D ground truth images for iterative model training without the need for manual painting in 3D. The Allen Cell Structure Segmenter thus leverages state of the art computer vision algorithms in an accessible way to facilitate their application by the experimental biology researcher. More details including algorithms, validations, and examples can be found in our [bioRxiv paper](https://www.biorxiv.org/content/10.1101/491035v1) or [allencell.org/segmenter](allencell.org/segmenter).
 
 
-**Note: This repository is only for the "Classic Image Segmentation Workflow". The deep learning part can be found at [https://github.com/AllenInstitute/aics-ml-segmentation](https://github.com/AllenInstitute/aics-ml-segmentation)**
+**Note: This repository only has the code for the "Classic Image Segmentation Workflow". The deep learning part can be found at [https://github.com/AllenInstitute/aics-ml-segmentation](https://github.com/AllenInstitute/aics-ml-segmentation)**
 
 
 ## Installation
@@ -32,7 +32,9 @@ After following the installation instructions above, users will find that the cl
 1. formulated as a simple 3-step workflow for solving 3D intracellular structure segmentation problem using restricted number of selectable algorithms and tunable parameters
 2. accompanied by a ["lookup table"](./docs/toolkit_paper_lookup_table_20181206.pdf) with 20 representative structure localization patterns and their results as a reference, as well as the Jupyter notebook for these workflows as a starting point. The [pseudocode of all 20 workflows](./docs/toolkit_paper_SI_vFinalForBioRxiv.pdf) are also provided.
 
-Typically, we use Jupyter notebook as a "playground" to explore different algorithms and adjust the parameters. After determining the algorithms and parameters, we use Python scritps to do batch processing/validation on a large number of data. [Link to DEMO](https://github.com/AllenInstitute/aics-ml-segmentation/blob/master/docs/demo_1.md)
+Typically, we use Jupyter notebook as a "playground" to explore different algorithms and adjust the parameters. After determining the algorithms and parameters, we use Python scritps to do batch processing/validation on a large number of data. 
+
+**You can find a [DEMO on a real example](https://github.com/AllenInstitute/aics-ml-segmentation/blob/master/docs/demo_1.md) on our tutorial page**
 
 ### Part 2: API  
 

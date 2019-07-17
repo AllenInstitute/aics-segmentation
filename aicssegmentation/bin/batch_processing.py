@@ -180,7 +180,10 @@ class Executor(object):
             sys.exit(1)
 
         output_path = pathlib.Path(args.output_dir)
-
+        
+        if not os.path.exists(output_path):
+            os.mkdir(output_path)
+            
         ##########################################################################
         if args.mode == PER_IMAGE:
 
