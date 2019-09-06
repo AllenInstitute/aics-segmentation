@@ -117,6 +117,8 @@ class Args(object):
                        help='the rescale ratio for x/y dimenstions, will overwrite --xy')
         p.add_argument('--output_dir', dest='output_dir',
                        help='output directory')
+        p.add_argument('--wrapper_dir', dest='wrapper_dir', default='_internal_',
+                       help='wrapper directory')
         p.add_argument('--use', dest='output_type', default='default', 
                         help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
 
@@ -171,8 +173,18 @@ class Executor(object):
             args.workflow_name = args.struct_name
         
         try:
-            module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
-            seg_module = importlib.import_module(module_name)
+            if args.wrapper_dir == '_internal_':
+                module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
+                seg_module = importlib.import_module(module_name)   
+            else:
+                func_path = args.wrapper_dir
+                spec = importlib.util.spec_from_file_location('seg_'+ args.workflow_name, func_path + '/seg_'+args.workflow_name+'.py')
+                seg_module = importlib.util.module_from_spec(spec)
+                try:
+                    spec.loader.exec_module(seg_module)
+                except Exception as e: 
+                    print('check errors in wrapper script')
+                    print(str(e))
             class_name = 'Workflow_'+ args.workflow_name
             SegModule = getattr(seg_module, class_name)
         except:
