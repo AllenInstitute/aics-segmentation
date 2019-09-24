@@ -12,6 +12,20 @@
 
 [What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
 
+#### 0. If you already have anaconda installed on your machine, you can double-check your version by
+
+```bash
+conda info
+```
+
+You may see somthing like
+```bash
+conda version : 4.6.11
+python version : 3.7.3.final.0
+```
+`conda version > 4.4` is preferred. To update conda, check out [how to update your conda](https://www.anaconda.com/keeping-anaconda-date/).
+`python version >=3.6` is required.
+
 #### 1. [Install conda on macOS](https://docs.conda.io/projects/conda/en/latest/user-guide/install/macos.html), choose anaconda installer.
 
 
@@ -56,15 +70,20 @@ git clone https://github.com/AllenInstitute/aics-segmentation.git
 
 ## Step 4: Install the package
 
+### Step 4.1: check `pip` version
+`pip show pip` will return your version of `pip`. It is recommended to do `pip install --upgrade pip` to keep your `pip` updated. 
 
-### Option 1: Build from source (recommended)
+
+### Step 4.2: build the package
 
 ```bash
 cd ~/Projects/aics-segmentation
-pip install numpy
-pip install -e .
-pip install itkwidgets==0.14.0
+pip3 install numpy
+pip3 install itkwidgets==0.14.0
+pip3 install -e .[all]
 ```
+
+Note: We use the packge `itkwidgets` for visualizaiotn within jupyter notebook. Currently, we find version `0.14.0` has the slightly better performance in visualizing segmentation results. If you find this viwer keeps crashing in your browser, try `pip3 uninstall itkwidgets` and then `pip3 install itkwidgets==0.12.2`. For JupyterLab users, version >= `0.17.1` is needed. 
 
 For Jupyter Lab users, the itk viewer requires additionally run:
 
@@ -73,10 +92,11 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager itk-jupyter-wid
 ```
 
 
-### Option 2: Install from PyPi (useful when running on a server/cluster)
+### Option 2: Build on server/cluster for production:
 
 ```bash
-pip install aicssegmentation
+pip3 install numpy
+pip3 install aicssegmentation
 ```
 
 ## Step 5: Test jupyter notebook demo

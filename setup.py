@@ -23,11 +23,11 @@ def readme():
 test_deps = ['pytest', 'pytest-cov']
 lint_deps = ['flake8']
 interactive_dev_deps = [
-    'matplotlib>=2.2.3',
+    'matplotlib',
     'jupyter',
     'itkwidgets',
-    'ipython==7.0.1',
-    'ipywidgets==7.4.1'
+    'ipython',
+    'ipywidgets'
 ]
 # may need itkwidgets==0.12.2. if viewer keeps crashing
 

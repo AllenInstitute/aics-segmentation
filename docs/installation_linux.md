@@ -12,7 +12,7 @@
 
 #### 2. [Start conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda)
 
-All commands below are typed into Anaconda Prompt window
+All commands below are typed in the Terminal window
 
 #### 3. Create a new empty conda environment, which we will name "segmentation" (You can certainly choose a different name.)
 

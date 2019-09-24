@@ -9,7 +9,7 @@
 
 Note: Depending on the time you access this page, you may be directed to the download page of "Build Tools for Visual Studio 2017" or "Build Tools for Visual Studio 2018", etc. In general, as long as the version is at least 2015, any subsequent version should work. 
 
-When you install the Build Tool, you may be asked to choose what to install. Only the tool for Visual Studio C++ is required for the Allen Cell Segmenter. After intalling the Build Tool, make sure to reboot your machine. 
+When you install the Build Tool, you may be asked to choose what to install. Only the tool for Visual Studio C++ is required for the Allen Cell Segmenter. After installing the Build Tool, make sure to reboot your machine. 
 
 ## Step 2: Setup conda environment 
 
