@@ -1,18 +1,28 @@
 # Installation Instruction for MacOS
 
-(tested on XXXXX)
+## Step 0: Install XCode
 
-
-## Step 1: Install XCode
+*Go to Step 1 if you already have XCode installed (it is very likely that you already have it, if you have done any python or C++ programming on your machine).*
 
 [Download and install XCode from Apple Developer](https://developer.apple.com/xcode/)
 
+Note: Depending on the time you access this page, you may be directed to a different page. As effective date of Sep 24 2019, you can find ‘Software Downloads’ at the bottom of the page and follow the download and installation instructions.
 
-## Step 2: Setup conda environment 
+## Step 1: Install Conda 
 
-[What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
+*Go to Step 2 if you have anaconda or miniconda installed*
 
-#### 0. If you already have anaconda installed on your machine, you can double-check your version by
+Go to [Install conda on macOS](https://docs.conda.io/projects/conda/en/latest/user-guide/install/macos.html), choose Anaconda Installer (for Python 3) and then follow the installation instructions.
+
+Note: [What is conda and anaconda, and why we need this?](conda_why.md) Because conda can effectively manage environment and package installation, setting up conda will make the following steps straightforward and help avoid future problems (conda itself is also very easy to set up).
+
+## Step 2: Verify requirement and prepare for installing segmenter
+
+#### Step 2.1: [Start conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda)
+
+All commands below are typed into the Terminal Window
+
+#### Step 2.2: Test conda version
 
 ```bash
 conda info
@@ -23,23 +33,32 @@ You may see somthing like
 conda version : 4.6.11
 python version : 3.7.3.final.0
 ```
-`conda version > 4.4` is preferred. To update conda, check out [how to update your conda](https://www.anaconda.com/keeping-anaconda-date/).
-`python version >=3.6` is required.
 
-#### 1. [Install conda on macOS](https://docs.conda.io/projects/conda/en/latest/user-guide/install/macos.html), choose anaconda installer.
+`conda version > 4.4` is preferred. To update conda, check out [how to update your conda](https://www.anaconda.com/keeping-anaconda-date/). `python version >=3.6` is required.
 
+#### Step 2.3: Test git
 
-#### 2. [Start conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html#starting-conda)
+```bash 
+git --version
+```
 
-All commands below are typed into the Terminal Window
+If you don't have git, follow [Git for macOS](https://www.atlassian.com/git/tutorials/install-git#mac-os-x) to install and restart conda after installing git.
 
-#### 3. Create a new empty conda environment, which we will name "segmentation" (You can certainly choose a different name.)
+#### Step 2.4: Test pip
+
+```bash
+pip show pip
+```
+
+A message will be printed out on your screen. If you see a warning, like a newer version is available, you can follow the instruction to upgrade you pip.
+
+#### Step 2.5: Create a new empty conda environment, which we will name "segmentation" (You can certainly choose a different name.)
 
 ``` bash 
 conda create -n segmentation python=3.6
 ```
 
-#### 4. Activate your new conda environment "segmentation"
+### Step 2.6: Activate your conda environment "segmentation"
 
 ``` bash
 conda activate segmentation
@@ -47,65 +66,49 @@ conda activate segmentation
 
 (For older version conda, the command is `source activate segmentation`.)
 
-#### 5. Now, you are in "segmentation" environment. You can install the package following the steps below.
+### Step 2.7: Install nb_conda (for easy conda environment management in jupyter notebook)
 
-
-## Step 3: Clone the github repository 
-
-
-#### 1. Check if you have git installed.
-
-```bash 
-git --version
+```bash
+conda install nb_conda
 ```
 
-If you don't have git, follow [Git for macOS](https://www.atlassian.com/git/tutorials/install-git#mac-os-x) to install.
+## Step 3: Install segmenter
 
-#### 2. Clone aics-segmentation repository from Github (suppose you want to save the folder under '~/Projects')
+#### Step 3.1: Clone aics-segmentation repository from Github (suppose you want to save the folder under '~/Projects')
 
 ```bash
 cd ~/Projects
 git clone https://github.com/AllenInstitute/aics-segmentation.git
 ```
 
-## Step 4: Install the package
-
-### Step 4.1: check `pip` version
-`pip show pip` will return your version of `pip`. It is recommended to do `pip install --upgrade pip` to keep your `pip` updated. 
-
-
-### Step 4.2: build the package
+#### Step 3.2: install the packages
 
 ```bash
 cd ~/Projects/aics-segmentation
-pip3 install numpy
-pip3 install itkwidgets==0.14.0
-pip3 install -e .[all]
+pip install numpy
+pip install itkwidgets==0.14.0
+pip install -e .[all]
 ```
 
-Note: We use the packge `itkwidgets` for visualizaiotn within jupyter notebook. Currently, we find version `0.14.0` has the slightly better performance in visualizing segmentation results. If you find this viwer keeps crashing in your browser, try `pip3 uninstall itkwidgets` and then `pip3 install itkwidgets==0.12.2`. For JupyterLab users, version >= `0.17.1` is needed. 
+Note 1: Please note that for the users with both python 2 and python 3 installed, use `pip3` instead of `pip` in the commands
 
-For Jupyter Lab users, the itk viewer requires additionally run:
+Note 2: We use the packge `itkwidgets` for visualizaiotn within jupyter notebook. Currently, we find version `0.14.0` has slightly better performance in visualizing segmentation results. If you find this viwer keeps crashing in your browser, try `pip uninstall itkwidgets` and then `pip install itkwidgets==0.12.2`. For JupyterLab users, version >= `0.17.1` is needed.
+
+Note 3: For Jupyter Lab users, the itk viewer requires additionally run:
 
 ```
 jupyter labextension install @jupyter-widgets/jupyterlab-manager itk-jupyter-widgets
 ```
 
+Note 4: For advanced user to deploy segmenter on cluster, our package is also [available on PyPi](https://pypi.org/project/aicssegmentation/)
 
-### Option 2: Build on server/cluster for production:
 
-```bash
-pip3 install numpy
-pip3 install aicssegmentation
-```
-
-## Step 5: Test jupyter notebook demo
-
+#### Step 3.3: Test segmenter
 
 ``` bash 
 cd ~/Projects/aics-segmentation/lookup_table_demo
 jupyter notebook
 ```
 
-This will take you to your default browser (e.g., Safari) and launch Jupyter Notebook App within your browser.Open "demo_TNNI1.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
+This will take you to your default browser (e.g., Safari) and launch Jupyter Notebook App within your browser.Open "test_viwer.ipynb" and test if you can run the notebook from beginning to the end. See more details on [How to use Jupyter Notebook to running the workflow in the Look-up Table](../docs/jupyter_lookup_table.md)
 
