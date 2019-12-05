@@ -1,5 +1,6 @@
 import os 
 import numpy as np
+import pandas as pd
 from scipy.ndimage.measurements import label
 
 def simple_builder(bw, se=None, return_dataframe=False):
@@ -34,7 +35,7 @@ def masked_builder(bw, mask_label):
         valid_bw = bw.copy()
         valid_bw[single_mask==0]=0
         valid_label, valid_label_num = label(valid_bw>0)
-        for jj, valid_index in range(valid_label_num):
+        for valid_index in range(valid_label_num):
             index_plus = valid_index + 1
             this_obj_index = index_plus + counter_offset
             this_obj = valid_label==index_plus
@@ -47,6 +48,6 @@ def masked_builder(bw, mask_label):
     
     return obj_label, obj_df.set_index(['mask_id', 'obj_id'])
 
-def masked_builder(img_list):
+def hierachical_builder(img_list):
     print('under construction')
     pass 
