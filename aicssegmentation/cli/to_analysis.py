@@ -2,7 +2,7 @@ import os
 import numpy as np
 from scipy.ndimage.measurements import label
 
-def simple_objectifier(bw, se=None, return_dataframe=False):
+def simple_builder(bw, se=None, return_dataframe=False):
 
     if se is None:
         obj_label, obj_num = label(bw>0)
@@ -16,7 +16,7 @@ def simple_objectifier(bw, se=None, return_dataframe=False):
     else:
         return obj_label
 
-def masked_objectifier(bw, mask_label):
+def masked_builder(bw, mask_label):
 
     assert mask_label.max()>0
 
@@ -45,4 +45,8 @@ def masked_objectifier(bw, mask_label):
     obj_df = pd.DataFrame(multi_index_list)
     obj_df.columns=['mask_id', 'obj_id', 'vol']
     
-    return obj_df.set_index(['mask_id', 'obj_id'])
+    return obj_label, obj_df.set_index(['mask_id', 'obj_id'])
+
+def masked_builder(img_list):
+    print('under construction')
+    pass 
