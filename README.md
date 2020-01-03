@@ -39,6 +39,14 @@ Typically, we use Jupyter notebook as a "playground" to explore different algori
 The list of high-level wrappers/functions used in the package can be found [HERE](./docs/API.md). We are working on additional documentations and examples for advanced users/developers. 
 
 
+## Object Identification: Bridging the gap between binary image (segmentation) and analysis
+
+The current version of the Allen Cell Segmenter is primarily focusing on converting fluorescent images into binary images, i.e., the mask of the target structures separated from the background (a.k.a segmentation). But, the binary images themselves are not always useful, with perhaps the exception of visualization of the entire image, until they are converted into statistically sound numbers that are then used for downstream analysis. Often the desired numbers do not refer to all masked voxels in an entire image but instead to specific “objects” or groups of objects within the image. In our python package, we provide functions to bridge the gap between binary segmentation and downstream analysis by via  **object identification**.
+
+**[What is object identification?](https://github.com/AllenInstitute/aics-ml-segmentation/blob/master/docs/object_identification.md)**
+
+
+
 ## Citing Segmenter
 
 If you find our segmenter useful in your research, please cite our bioRxiv paper:
