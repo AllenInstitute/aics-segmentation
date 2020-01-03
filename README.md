@@ -43,7 +43,7 @@ The list of high-level wrappers/functions used in the package can be found [HERE
 
 The current version of the Allen Cell Segmenter is primarily focusing on converting fluorescent images into binary images, i.e., the mask of the target structures separated from the background (a.k.a segmentation). But, the binary images themselves are not always useful, with perhaps the exception of visualization of the entire image, until they are converted into statistically sound numbers that are then used for downstream analysis. Often the desired numbers do not refer to all masked voxels in an entire image but instead to specific “objects” or groups of objects within the image. In our python package, we provide functions to bridge the gap between binary segmentation and downstream analysis by via  **object identification**.
 
-**[What is object identification?](https://github.com/AllenInstitute/aics-ml-segmentation/blob/master/docs/object_identification.md)**
+**[What is object identification?](https://github.com/AllenInstitute/aics-segmentation/blob/master/docs/object_identification.md)**
 
 
 
