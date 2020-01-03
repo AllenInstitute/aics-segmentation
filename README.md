@@ -46,7 +46,7 @@ The current version of the Allen Cell Segmenter is primarily focusing on convert
 **[What is object identification?](https://github.com/AllenInstitute/aics-segmentation/blob/master/docs/object_identification.md)**
 
 
-**[See a real demo in jupyter notebook to learn how to use the object identification functions](https://github.com/AllenInstitute/aics-segmentation/blob/master/docs/bridging_the_gap_between_binary_image_and_analysis.ipynb)**
+**[See a real demo in jupyter notebook to learn how to use the object identification functions](https://github.com/AllenInstitute/aics-segmentation/blob/master/lookup_table_demo/bridging_the_gap_between_binary_image_and_analysis.ipynb)**
 
 
 ## Citing Segmenter
