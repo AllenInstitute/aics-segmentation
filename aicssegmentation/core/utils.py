@@ -1,9 +1,12 @@
 import numpy as np
-from skimage.morphology import medial_axis
 from scipy.ndimage import distance_transform_edt
-from skimage.morphology import erosion, ball
+from scipy.ndimage.morphology import binary_opening
+from skimage.morphology import erosion, ball, medial_axis
 import aicsimageio
 from skimage.measure import label, regionprops
+from skimage.segmentation import find_boundaries
+
+import SimpleITK as sitk
 
 def hole_filling(bw, hole_min, hole_max, fill_2d=True):
 
@@ -167,3 +170,33 @@ def get_3dseed_from_mid_frame(bw, stack_shape, mid_frame, hole_min, bg_seed = Tr
         seed[mid_frame,int(py),int(px)]=seed_count
 
     return seed
+
+def levelset_segmentation(smooth_img, seed, niter, max_error, epsilon, curvature_weight, smoothing_weight):
+    # This function performs chan vese segmentation
+    #
+    # initialize level-set
+    level0 = find_boundaries(seed, connectivity=1, mode='outer')
+    init_levelset = distance_transform_edt(~seed) - distance_transform_edt(seed)
+    init_levelset[level0] = 0 
+    itk_img = sitk.GetImageFromArray(smooth_img.astype("float")) # Prepare original image
+
+    lsFilter = sitk.ScalarChanAndVeseDenseLevelSetImageFilter()
+    lsFilter.SetMaximumRMSError(max_error)
+    lsFilter.SetNumberOfIterations(niter)
+    lsFilter.SetLambda1(1)
+    lsFilter.SetLambda2(1)
+    lsFilter.SetEpsilon(epsilon)
+    lsFilter.SetCurvatureWeight(curvature_weight)
+    lsFilter.SetAreaWeight(0.0)
+    lsFilter.SetReinitializationSmoothingWeight(smoothing_weight)
+    lsFilter.SetVolume(0.0)
+    lsFilter.SetVolumeMatchingWeight(0.0)
+    lsFilter.SetHeavisideStepFunction(lsFilter.AtanRegularizedHeaviside)
+    ls = lsFilter.Execute(sitk.GetImageFromArray(init_levelset), itk_img)
+    out = sitk.GetArrayFromImage(ls>0).astype("uint8")
+
+    # Post processing
+    out = hole_filling(out, 100, 1500, fill_2d=False)
+    out = binary_opening(out, structure=ball(6)).astype("uint8")
+
+    return out

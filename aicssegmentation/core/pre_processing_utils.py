@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.ndimage import gaussian_filter
+from scipy import ndimage as ndi
 
 
 def intensity_normalization(struct_img, scaling_param):
@@ -113,3 +114,9 @@ def suggest_normalization_param(structure_img0):
     print('To further enhance the contrast: You may increase the first value (may loss some dim parts), or decrease the second value' +
           '(may loss some texture in super bright regions)')
     print('To slightly reduce the contrast: You may decrease the first value, or increase the second value')
+
+def background_sub(img, r):
+    struct_img_smooth = ndi.gaussian_filter(img, sigma=r, mode='nearest', truncate=3.0)
+    struct_img_smooth_sub = img - struct_img_smooth
+    struct_img = (struct_img_smooth_sub - struct_img_smooth_sub.min())/(struct_img_smooth_sub.max()-struct_img_smooth_sub.min())
+    return struct_img
