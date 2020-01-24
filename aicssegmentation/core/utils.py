@@ -197,6 +197,40 @@ def levelset_segmentation(smooth_img, seed, niter, max_error, epsilon, curvature
 
     # Post processing
     out = hole_filling(out, 100, 1500, fill_2d=False)
-    out = binary_opening(out, structure=ball(6)).astype("uint8")
+    out = binary_opening(out, structure=ball(4)).astype("uint8")
 
     return out
+
+def fast_marching_levelset_segmentation(smooth_img, seed):
+    # This function performs fast marching segmentation
+    #
+    # Change image format to sitk image format
+    itk_img = sitk.GetImageFromArray(smooth_img.astype("float"))
+
+    # set gradient filter
+    gradient_filter = sitk.GradientMagnitudeImageFilter()
+    gradient = gradient_filter.Execute(itk_img)
+
+    # Now need to invert gradient to make gradient inside object to negative. Use sigmoid function with negative parameter
+    sigmoid = sitk.SigmoidImageFilter()
+    sigmoid.SetOutputMaximum(1)
+    sigmoid.SetOutputMinimum(0)
+    sigmoid.SetAlpha(-0.5)
+    sigmoid.SetBeta(3.0)
+    invert_gradeint = sigmoid.Execute(gradient)
+
+    # Fast marching levelset
+    fast_marching = sitk.FastMarchingImageFilter()
+    fast_marching.SetTrialPoints(seed)
+    fastMarchingOutput = fast_marching.Execute(invert_gradeint)
+
+    # Using binary threshold
+    thresholder = sitk.BinaryThresholdImageFilter()
+    thresholder.SetLowerThreshold(0.0)
+    # thresholder.SetUpperThreshold(timeThreshold)
+    thresholder.SetOutsideValue(0)
+    thresholder.SetInsideValue(255)
+
+    seg = thresholder.Execute(fastMarchingOutput)
+
+    return seg
