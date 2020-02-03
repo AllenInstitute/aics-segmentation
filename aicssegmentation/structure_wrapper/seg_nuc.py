@@ -67,7 +67,7 @@ def Workflow_nuc(struct_img,rescale_ratio,output_type, output_path, fn, output_f
     out_img_list.append(seed.copy())
     out_name_list.append('bw_coarse')
 
-    # step 2: Levelset based segmentation
+    # step 2: Levelset based segmentation. Parameter can be tuned based on dataset.
     final_seg = levelset_segmentation(
                                     structure_img_smooth, 
                                     seed, 
