@@ -16,7 +16,7 @@ exec(open(PACKAGE_NAME + "/version.py").read())
 
 
 def readme():
-    with open('README.md') as f:
+    with open('README.md',encoding='utf-8') as f:
         return f.read()
 
 
