@@ -5,6 +5,7 @@ The Allen Cell Structure Segmenter is a Python-based open source toolkit develop
 
 **Note: This repository only has the code for the "Classic Image Segmentation Workflow". The deep learning part can be found at [https://github.com/AllenInstitute/aics-ml-segmentation](https://github.com/AllenInstitute/aics-ml-segmentation)**
 
+We welcome feedback and submission of issues. Users are encouraged to sign up on our [Allen Cell Discussion Forum](https://forum.allencell.org/) for quesitons and comments.
 
 ## Installation
 
@@ -56,5 +57,5 @@ If you find our segmenter useful in your research, please cite our bioRxiv paper
 > J. Chen, L. Ding, M.P. Viana, M.C. Hendershott, R. Yang, I.A. Mueller, S.M. Rafelski. The Allen Cell Structure Segmenter: a new open source toolkit for segmenting 3D intracellular structures in fluorescence microscopy images. bioRxiv. 2018 Jan 1:491035.
 
 ## Level of Support
-We are offering it to the community AS IS; we have used the toolkit within our organization. We are not able to provide guarantees of support. However, we welcome feedback and submission of issues. Users are encouraged to sign up on our [Allen Cell Discussion Forum](https://forum.allencell.org/) for community quesitons and comments.
+We are offering it to the community AS IS; we have used the toolkit within our organization. We are not able to provide guarantees of support. 
 

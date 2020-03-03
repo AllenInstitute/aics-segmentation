@@ -5,11 +5,23 @@ import ipywidgets as widgets
 from ipywidgets import interact, fixed
 from IPython.display import display
 
-from itkwidgets import view
+from .seg_dot import logSlice
 
 def sliceViewer(im, zz):
     plt.imshow(im[zz,:,:])
     plt.show()
+
+def random_colormap(nn=10000):
+    from matplotlib import cm
+    viridis = cm.get_cmap('viridis', nn)
+    for ii in range(nn):
+        for jj in range(3):
+            viridis.colors[ii][jj] = np.random.rand()
+    viridis.colors[0][0]=0
+    viridis.colors[0][1]=0
+    viridis.colors[0][2]=0
+    
+    return viridis
 
 def explore_dot_3d(img, sigma, th, roi=[-1]):
     # roi = [x0, y0, x1, y1]
