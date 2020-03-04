@@ -116,6 +116,27 @@ def vesselness2D(nd_array, sigmas, tau=0.5, whiteonblack=True):
 
     return np.max(filtered_array, axis=0)
 
+def vesselness2D_range(nd_array, scale_range=(1, 10), scale_step=2, tau=0.5, whiteonblack=True):
+
+    if not nd_array.ndim == 2:
+        raise(ValueError("Only 2 dimensions is currently supported"))
+
+    # from https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/_frangi.py#L74
+    sigmas = np.arange(scale_range[0], scale_range[1], scale_step)
+    if np.any(np.asarray(sigmas) < 0.0):
+        raise ValueError("Sigma values less than zero are not valid")
+
+    print(sigmas)
+
+    filtered_array = np.zeros(sigmas.shape + nd_array.shape)
+
+    for i, sigma in enumerate(sigmas):
+        eigenvalues = absolute_3d_hessian_eigenvalues(nd_array, sigma=sigma, scale=True, whiteonblack=True)
+        #print(eigenvalues[1])
+        #print(eigenvalues[2])
+        filtered_array[i] = compute_vesselness2D(eigenvalues[1], tau = tau)
+
+    return np.max(filtered_array, axis=0)
 
 def vesselnessSliceBySlice(nd_array, sigmas, tau=0.5, whiteonblack=True):
 

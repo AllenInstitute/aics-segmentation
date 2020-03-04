@@ -5,8 +5,6 @@ import ipywidgets as widgets
 from ipywidgets import interact, fixed
 from IPython.display import display
 
-from .seg_dot import logSlice
-
 def sliceViewer(im, zz):
     plt.imshow(im[zz,:,:])
     plt.show()
@@ -65,7 +63,7 @@ def explore_vesselness_2d(im, sigma, th, roi=[-1]):
     return out
 
 def blob2dExplorer_single(im, sigma, th):
-    #from python_image_analysis.ptDetection import logSlice
+    from .seg_dot import logSlice
 
     bw = logSlice(im,(sigma[0],sigma[1],1) , th)
     plt.imshow(im)
@@ -73,9 +71,17 @@ def blob2dExplorer_single(im, sigma, th):
     plt.imshow(bw)
     plt.show()
 
-def blob2dExplorer_stack(im_stack, zz, sigma, th):
-    #from python_image_analysis.ptDetection import logSlice
+def fila2dExplorer_single(im, sigma, th):
+    from .vessel import vesselness2D
 
+    tmp = vesselness2D(im, [sigma], tau=1, whiteonblack=True)
+    plt.imshow(im)
+    plt.show()
+    plt.imshow(tmp>th)
+    plt.show()
+
+def blob2dExplorer_stack(im_stack, zz, sigma, th):
+    from .seg_dot import logSlice
     im = im_stack[zz,:,:]
 
     print(im.shape)
@@ -87,11 +93,11 @@ def blob2dExplorer_stack(im_stack, zz, sigma, th):
     plt.show()
 
 def vesselness2dExplorer(im, zz, sigma, th):
-    #from python_image_analysis.vessel import vesselness2D
+    from .vessel import vesselness2D_range
 
     mip= np.amax(im,axis=0)
     tmp = np.concatenate((im[zz,:,:],mip),axis=1)
-    tmp = vesselness2D(tmp, scale_range=(sigma[0],sigma[1]+0.5,0.5), scale_step=1, tau=1, whiteonblack=True)
+    tmp = vesselness2D_range(tmp, scale_range=(sigma[0],sigma[1]+0.5,0.5), scale_step=1, tau=1, whiteonblack=True)
     ves = np.zeros_like(mip)
     ves[:,:im.shape[2]-2]= tmp[:,:im.shape[2]-2]
     plt.imshow(im[zz,:,:])

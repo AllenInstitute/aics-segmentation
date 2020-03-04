@@ -22,7 +22,8 @@ def dot_2d(struct_img, log_sigma):
     return responce
 
 def logSlice(image, sigma_list, threshold):
-    gl_images = [-gaussian_laplace(image, s) * s ** 2 for s in sigma_list]
+
+    gl_images = [-gaussian_laplace(image, s) * (s ** 2) for s in sigma_list]
     
     # get the mask
     seg = np.zeros_like(image)
