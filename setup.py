@@ -53,12 +53,13 @@ setup(name=PACKAGE_NAME,
           ]
       },
       install_requires=[
+          'tifffile==0.15.1',
           'numpy>=1.15.1',
           'scipy>=1.1.0',
-          'scikit-image>=0.14.0',
+          'scikit-image==0.15.0',
           'pandas>=0.23.4',
           'aicsimageio>=0.4.3,<3.0.0',
-          'aicsimageprocessing',
+          'aicsimageprocessing==0.7.1',
           'numba>=0.40.0',
           'itk'
       ],
