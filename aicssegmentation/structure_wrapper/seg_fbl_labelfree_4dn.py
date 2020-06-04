@@ -11,7 +11,7 @@ from aicsimageprocessing import resize
 #### do not remove ####
 from aicssegmentation.core.output_utils import  save_segmentation
 
-def Workflow_template(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
+def Workflow_fbl_labelfree_4dn(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     minArea = 5
