@@ -8,6 +8,7 @@ import argparse
 import traceback
 import importlib
 import pathlib
+from glob import glob
 
 import aicsimageio
 
@@ -209,18 +210,23 @@ class Executor(object):
 
         elif args.mode == PER_DIR:
 
-            filenames = [os.path.basename(os.path.splitext(f)[0])
-                         for f in os.listdir(args.input_dir)
-                         if f.endswith(args.data_type)]
+            filenames = glob(args.input_dir + '/*' + args.data_type)
+            #[os.path.basename(os.path.splitext(f)[0])
+            #             for f in os.listdir(args.input_dir)
+            #             if f.endswith(args.data_type)]
             filenames.sort()
 
             for _, fn in enumerate(filenames):
 
-                image_reader = aicsimageio.AICSImage(os.path.join(args.input_dir, f'{fn}{args.data_type}'))
+                if os.path.exists(str(output_path / (os.path.splitext(os.path.basename(fn))[0] + '_struct_segmentation.tiff'))):
+                    print(f'skipping {fn} ....')
+                    continue
+
+                image_reader = aicsimageio.AICSImage(fn)
                 img = image_reader.data
                 struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
 
-                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
+                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, os.path.splitext(os.path.basename(fn))[0])
 
 ###############################################################################
 
