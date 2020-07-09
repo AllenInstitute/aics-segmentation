@@ -253,7 +253,7 @@ see [doc on skimage](http://scikit-image.org/docs/dev/api/skimage.morphology.htm
 Fill holes in 2D/3D segmentation
 
 ```python
-from aicssegmentation.utils import hole_filling
+from aicssegmentation.core.utils import hole_filling
 bw_filled = hole_filling(bw, hole_min, hole_max, fill_2d=True)
 ```
 
@@ -269,7 +269,7 @@ bw_filled = hole_filling(bw, hole_min, hole_max, fill_2d=True)
 perform thinning on segmentation without breaking topology
 
 ```python
-from aicssegmentation.utils import topology_preserving_thinning
+from aicssegmentation.core.utils import topology_preserving_thinning
 bw_thin = topology_preserving_thinning(bw>0, thin_dist_preserve, thin_dist)
 ```
 
@@ -303,7 +303,7 @@ suggest_normalization_param(img)
 estimate the index of the center slice of the colony (e.g, an image with 70 z-slices and cells mostly in slice 30-60 should have 45 as the center slice of the colony instead of 70/2=35)
 
 ```python
-from aicssegmentation.utils import get_middle_frame
+from aicssegmentation.core.utils import get_middle_frame
 mid_z = get_middle_frame(structure_img_smooth, method='intensity')
 ```
 

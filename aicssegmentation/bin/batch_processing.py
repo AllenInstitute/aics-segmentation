@@ -8,6 +8,7 @@ import argparse
 import traceback
 import importlib
 import pathlib
+from glob import glob
 
 import aicsimageio
 import pdb
@@ -118,6 +119,8 @@ class Args(object):
                        help='the rescale ratio for x/y dimenstions, will overwrite --xy')
         p.add_argument('--output_dir', dest='output_dir',
                        help='output directory')
+        p.add_argument('--wrapper_dir', dest='wrapper_dir', default='_internal_',
+                       help='wrapper directory')
         p.add_argument('--use', dest='output_type', default='default', 
                         help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
         p.add_argument('--mitotic_stage', dest='mitotic_stage', default=None, 
@@ -174,12 +177,27 @@ class Executor(object):
             args.workflow_name = args.struct_name
         
         try:
+<<<<<<< HEAD
             # if sys path not set yet use this code
             sys.path.append("/allen/aics/assay-dev/users/Hyeonwoo/code/aics-segmentation/")
             # pdb.set_trace()
 
             module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
             seg_module = importlib.import_module(module_name)
+=======
+            if args.wrapper_dir == '_internal_':
+                module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
+                seg_module = importlib.import_module(module_name)   
+            else:
+                func_path = args.wrapper_dir
+                spec = importlib.util.spec_from_file_location('seg_'+ args.workflow_name, func_path + '/seg_'+args.workflow_name+'.py')
+                seg_module = importlib.util.module_from_spec(spec)
+                try:
+                    spec.loader.exec_module(seg_module)
+                except Exception as e: 
+                    print('check errors in wrapper script')
+                    print(str(e))
+>>>>>>> 27f801a8a3228abadaf29bc8b6180e141799e276
             class_name = 'Workflow_'+ args.workflow_name
             SegModule = getattr(seg_module, class_name)
         except:
@@ -187,7 +205,10 @@ class Executor(object):
             sys.exit(1)
 
         output_path = pathlib.Path(args.output_dir)
-
+        
+        if not os.path.exists(output_path):
+            os.mkdir(output_path)
+            
         ##########################################################################
         if args.mode == PER_IMAGE:
 
@@ -215,14 +236,19 @@ class Executor(object):
 
         elif args.mode == PER_DIR:
 
-            filenames = [os.path.basename(os.path.splitext(f)[0])
-                         for f in os.listdir(args.input_dir)
-                         if f.endswith(args.data_type)]
+            filenames = glob(args.input_dir + '/*' + args.data_type)
+            #[os.path.basename(os.path.splitext(f)[0])
+            #             for f in os.listdir(args.input_dir)
+            #             if f.endswith(args.data_type)]
             filenames.sort()
 
             for _, fn in enumerate(filenames):
 
-                image_reader = aicsimageio.AICSImage(os.path.join(args.input_dir, f'{fn}{args.data_type}'))
+                if os.path.exists(str(output_path / (os.path.splitext(os.path.basename(fn))[0] + '_struct_segmentation.tiff'))):
+                    print(f'skipping {fn} ....')
+                    continue
+
+                image_reader = aicsimageio.AICSImage(fn)
                 img = image_reader.data
                 # import pdb; pdb.set_trace()
 
@@ -244,6 +270,10 @@ class Executor(object):
                 else:
                     SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fn)
 
+<<<<<<< HEAD
+=======
+                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, os.path.splitext(os.path.basename(fn))[0])
+>>>>>>> 27f801a8a3228abadaf29bc8b6180e141799e276
 
 ###############################################################################
 

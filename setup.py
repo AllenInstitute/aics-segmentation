@@ -16,18 +16,18 @@ exec(open(PACKAGE_NAME + "/version.py").read())
 
 
 def readme():
-    with open('README.md') as f:
+    with open('README.md',encoding='utf-8') as f:
         return f.read()
 
 
 test_deps = ['pytest', 'pytest-cov']
 lint_deps = ['flake8']
 interactive_dev_deps = [
-    'matplotlib>=2.2.3',
+    'matplotlib',
     'jupyter',
     'itkwidgets',
-    'ipython==7.0.1',
-    'ipywidgets==7.4.1'
+    'ipython',
+    'ipywidgets'
 ]
 # may need itkwidgets==0.12.2. if viewer keeps crashing
 
@@ -57,7 +57,7 @@ setup(name=PACKAGE_NAME,
           'scipy>=1.1.0',
           'scikit-image>=0.14.0',
           'pandas>=0.23.4',
-          'aicsimageio>=0.4.3',
+          'aicsimageio>=0.4.3,<3.0.0',
           'aicsimageprocessing',
           'numba>=0.40.0',
           'itk'

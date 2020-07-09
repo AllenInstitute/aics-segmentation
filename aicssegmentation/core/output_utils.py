@@ -41,6 +41,7 @@ def output_hook(im, names, out_flag, output_path, fn):
                 writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_' + names[i] + '.tiff')))
                 writer.save(im[i])
 
+
 def paperFigure(out_img_list, out_name_list, output_type, output_path, fn):
     out_flag = []
     for i in range(len(out_name_list)):
