@@ -35,10 +35,10 @@ def output_hook(im, names, out_flag, output_path, fn):
                 segmentation_type = names[i]
                 bw = im[i].astype(np.uint8)
                 bw[bw>0]=255
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(output_path + os.sep + fn + '_bw_' + segmentation_type[3:] + '.tiff')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_bw_' + segmentation_type[3:] + '.tiff')))
                 writer.save(bw)
             else:
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(output_path + os.sep + fn + '_' + names[i] + '.tiff')
+                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_' + names[i] + '.tiff')))
                 writer.save(im[i])
 
 def paperFigure(out_img_list, out_name_list, output_type, output_path, fn):

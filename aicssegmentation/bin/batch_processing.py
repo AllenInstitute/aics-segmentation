@@ -10,6 +10,7 @@ import importlib
 import pathlib
 
 import aicsimageio
+import pdb
 
 
 ###############################################################################
@@ -109,7 +110,7 @@ class Args(object):
                        help='Legacy Option for backward compatibility] use workflow_name instead')
         p.add_argument('--workflow_name', dest='workflow_name', default='template',
                        help='the name of your workflow')        
-        p.add_argument('--struct_ch', default=3, type=int, dest='struct_ch',
+        p.add_argument('--struct_ch', required=False, type=int, dest='struct_ch', default=2,
                        help='the index of the structure channel of the image file, default is 3')
         p.add_argument('--xy', default=0.108, type=float, dest='xy',
                        help='the xy resolution of the image, default is 0.108')
@@ -119,6 +120,8 @@ class Args(object):
                        help='output directory')
         p.add_argument('--use', dest='output_type', default='default', 
                         help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
+        p.add_argument('--mitotic_stage', dest='mitotic_stage', default=None, 
+                        help='mitotic_stage')
 
         subparsers = p.add_subparsers(dest='mode')
         subparsers.required = True
@@ -171,6 +174,10 @@ class Executor(object):
             args.workflow_name = args.struct_name
         
         try:
+            # if sys path not set yet use this code
+            sys.path.append("/allen/aics/assay-dev/users/Hyeonwoo/code/aics-segmentation/")
+            # pdb.set_trace()
+
             module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
             seg_module = importlib.import_module(module_name)
             class_name = 'Workflow_'+ args.workflow_name
@@ -188,9 +195,23 @@ class Executor(object):
 
             image_reader = aicsimageio.AICSImage(args.input_fname)
             img = image_reader.data
-            struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+            if len(img.shape) == 6:
+                struct_img = img[0,0,args.struct_ch, :, :, :].astype(np.float32)
+            else:
+                struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+            
+            # if args.mitotic_label == 'y':
+            #     mitosis_seg = (args.input_fname).replace("raw", "mito_seg")
+            #     mito_seg_reader = aicsimageio.AICSImage(mitosis_seg)
+            #     mitosis_seg_img = mito_seg_reader.data
 
-            SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fname)
+            #     mseg_img = mitosis_seg_img[0,0,:, 0, :, :].astype(np.float32)
+            #     struct_img =struct_img * mseg_img
+            
+            if args.mitotic_stage is None:
+                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fname)
+            else:
+                SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fname)
 
         elif args.mode == PER_DIR:
 
@@ -203,9 +224,26 @@ class Executor(object):
 
                 image_reader = aicsimageio.AICSImage(os.path.join(args.input_dir, f'{fn}{args.data_type}'))
                 img = image_reader.data
-                struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+                # import pdb; pdb.set_trace()
 
-                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
+                # fixing the image reading
+                if len(img.shape) == 6:
+                    # when z and c is not in order
+                    if img.shape[-3] < img.shape[-4]:
+                        img = np.transpose(img,(0,1,3,2,4,5))
+                    struct_img = img[0,0,args.struct_ch, :, :, :].astype(np.float32)
+                else:
+                    # when z and c is not in order
+                    if img.shape[-3] < img.shape[-4]:
+                        img = np.transpose(img,(0,2,1,3,4,))
+                    struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+
+                # Check if the segmenation is mitotic stage specific
+                if args.mitotic_stage is None:
+                    SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
+                else:
+                    SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fn)
+
 
 ###############################################################################
 

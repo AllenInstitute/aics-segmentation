@@ -1,0 +1,17 @@
+fbl_bright
+    intensity_norm_param = [1, 15]
+
+    gaussian_smoothing_sigma = 0.3
+
+    gaussian_smoothing_truncate_range = 3.0
+
+    dot_2d_sigma = 2
+
+    dot_2d_sigma_extra = 3
+
+    dot_2d_cutoff = 0.010
+
+    minArea = 5
+
+    low_level_min_size = 200
+

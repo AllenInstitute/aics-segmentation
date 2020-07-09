@@ -22,8 +22,11 @@ def intensity_normalization(struct_img, scaling_param):
         strech_max = struct_img.max()
         struct_img = (struct_img - strech_min + 1e-8)/(strech_max - strech_min + 1e-8)
     elif len(scaling_param) == 2:
-        print(f'intensity normalization: normalize into [mean - {scaling_param[0]} x std, mean + {scaling_param[1]} x std] ')
+        # print(f'intensity normalization: normalize into [mean - {scaling_param[0]} x std, mean + {scaling_param[1]} x std] ')
         m, s = norm.fit(struct_img.flat)
+        # print(m,s)
+        # import numpy as np
+        # import pdb; pdb.set_trace()
         strech_min = max(m - scaling_param[0] * s, struct_img.min())
         strech_max = min(m + scaling_param[1] * s, struct_img.max())
         struct_img[struct_img > strech_max] = strech_max
@@ -38,7 +41,7 @@ def intensity_normalization(struct_img, scaling_param):
         struct_img[struct_img < strech_min] = strech_min
         struct_img = (struct_img - strech_min + 1e-8)/(strech_max - strech_min + 1e-8)
 
-    print('intensity normalization completes')
+    # print('intensity normalization completes')
     return struct_img
 
 
@@ -59,8 +62,9 @@ def image_smoothing_gaussian_slice_by_slice(struct_img, sigma, truncate_range=3.
     return structure_img_smooth
 
 
-def edge_preserving_smoothing_3d(struct_img, numberOfIterations=5, conductance=1.2, timeStep=0.0625):
+def edge_preserving_smoothing_3d(struct_img, numberOfIterations=10, conductance=1.2, timeStep=0.0625):
     import itk
+    # numberOfIteration was 5 
 
     itk_img = itk.GetImageFromArray(struct_img.astype(np.float32))
 

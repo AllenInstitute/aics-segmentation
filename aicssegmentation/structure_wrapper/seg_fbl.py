@@ -19,7 +19,7 @@ def Workflow_fbl(struct_img,rescale_ratio, output_type, output_path, fn, output_
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
     dot_2d_sigma = 1
-    dot_2d_cutoff = 0.01
+    dot_2d_cutoff = 0.01 # 0.01 as default
     minArea = 5
     low_level_min_size = 700
     ##########################################################################
