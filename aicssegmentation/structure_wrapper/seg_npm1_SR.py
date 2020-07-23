@@ -1,28 +1,28 @@
 import numpy as np
 import os
-from skimage.morphology import remove_small_objects, erosion, ball, dilation
+from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
-from scipy.ndimage.morphology import binary_fill_holes
 from aicssegmentation.core.output_utils import save_segmentation, NPM1_output
 from aicsimageprocessing import resize
 
-def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_func=None):
+
+def Workflow_npm1_SR(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0.5, 15]
-    gaussian_smoothing_sigma = 1
+    intensity_norm_param = [0.05, 32]
+    gaussian_smoothing_sigma = 2
     gaussian_smoothing_truncate_range = 3.0
-    dot_2d_sigma = 2
+    dot_2d_sigma = 3
     dot_2d_sigma_extra = 1
     dot_2d_cutoff = 0.025
-    minArea = 5
-    low_level_min_size = 700
+    minArea = 8
+    low_level_min_size = 3000
     ##########################################################################
 
     out_img_list = []
@@ -54,7 +54,6 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     ###################
 
     # step 1: low level thresholding
-    #global_otsu = threshold_otsu(structure_img_smooth)
     global_tri = threshold_triangle(structure_img_smooth)
     global_median = np.percentile(structure_img_smooth,50)
 
@@ -81,15 +80,10 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
     response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
 
-    #inner_mask = bw_high_level.copy()
-    #for zz in range(inner_mask.shape[0]):
-    #    inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
 
     holes = np.logical_or(response_dark>dot_2d_cutoff , response_dark_extra>dot_2d_cutoff)
-    #holes[~inner_mask] = 0
 
     bw_extra = response_bright>dot_2d_cutoff
-    #bw_extra[~bw_high_level]=0
     bw_extra[~bw_low_level]=0
 
     bw_final = np.logical_or(bw_extra, bw_high_level)
@@ -117,10 +111,12 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     elif output_type == 'customize':
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
-    elif output_type == 'return':
-        return seg
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
         if output_type == 'QCB':
             return img_list, name_list
+
+
+
+

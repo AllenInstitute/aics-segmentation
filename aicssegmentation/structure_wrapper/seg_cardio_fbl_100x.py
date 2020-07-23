@@ -1,28 +1,28 @@
 import numpy as np
 import os
-from skimage.morphology import remove_small_objects, erosion, ball, dilation
+from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_3d
 from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
-from scipy.ndimage.morphology import binary_fill_holes
-from aicssegmentation.core.output_utils import save_segmentation, NPM1_output
+from aicssegmentation.core.output_utils import save_segmentation, FBL_output
 from aicsimageprocessing import resize
+from skimage.io import imsave
 
-def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_func=None):
+
+def Workflow_cardio_fbl_100x(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
     #   and work well accross different datasets
 
-    intensity_norm_param = [0.5, 15]
+    intensity_norm_param = [0.5, 3]
     gaussian_smoothing_sigma = 1
     gaussian_smoothing_truncate_range = 3.0
-    dot_2d_sigma = 2
-    dot_2d_sigma_extra = 1
-    dot_2d_cutoff = 0.025
-    minArea = 5
-    low_level_min_size = 700
+    dot_2d_sigma = 1
+    dot_2d_cutoff = 0.015
+    minArea = 1
+    low_level_min_size = 600
     ##########################################################################
 
     out_img_list = []
@@ -36,7 +36,7 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
 
     out_img_list.append(struct_img.copy())
     out_name_list.append('im_norm')
-
+    
     # rescale if needed
     if rescale_ratio>0:
         struct_img = resize(struct_img, [1, rescale_ratio, rescale_ratio], method="cubic")
@@ -61,7 +61,6 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     th_low_level = (global_tri + global_median)/2
     bw_low_level = structure_img_smooth > th_low_level
     bw_low_level = remove_small_objects(bw_low_level, min_size=low_level_min_size, connectivity=1, in_place=True)
-    bw_low_level = dilation(bw_low_level, selem=ball(2))
 
     # step 2: high level thresholding
     local_cutoff = 0.333 * threshold_otsu(structure_img_smooth)
@@ -71,34 +70,26 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
         single_obj = (lab_low==(idx+1))
         local_otsu = threshold_otsu(structure_img_smooth[single_obj])
         if local_otsu > local_cutoff:
-            bw_high_level[np.logical_and(structure_img_smooth>0.98*local_otsu, single_obj)]=1
+            bw_high_level[np.logical_and(structure_img_smooth>1.1*local_otsu, single_obj)]=1
 
     out_img_list.append(bw_high_level.copy())
-    out_name_list.append('bw_coarse')
+    out_name_list.append('interm_high')
 
-    response_bright = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
+    # step 3: finer segmentation
+    response2d = dot_slice_by_slice(structure_img_smooth, log_sigma=dot_2d_sigma)
 
-    response_dark = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma)
-    response_dark_extra = dot_slice_by_slice(1 - structure_img_smooth, log_sigma=dot_2d_sigma_extra)
+    bw_finer = remove_small_objects(response2d>dot_2d_cutoff, min_size=minArea, connectivity=1, in_place=True)
 
-    #inner_mask = bw_high_level.copy()
-    #for zz in range(inner_mask.shape[0]):
-    #    inner_mask[zz,:,:] = binary_fill_holes(inner_mask[zz,:,:])
+    out_img_list.append(bw_finer.copy())
+    out_name_list.append('bw_fine')
 
-    holes = np.logical_or(response_dark>dot_2d_cutoff , response_dark_extra>dot_2d_cutoff)
-    #holes[~inner_mask] = 0
-
-    bw_extra = response_bright>dot_2d_cutoff
-    #bw_extra[~bw_high_level]=0
-    bw_extra[~bw_low_level]=0
-
-    bw_final = np.logical_or(bw_extra, bw_high_level)
-    bw_final[holes]=0
+    # merge finer level detection into high level coarse segmentation to include outside dim parts
+    bw_high_level[bw_finer>0]=1
 
     ###################
     # POST-PROCESSING
     ###################
-    seg = remove_small_objects(bw_final, min_size=minArea, connectivity=1, in_place=True)
+    seg = remove_small_objects(bw_high_level>0, min_size=minArea, connectivity=1, in_place=False)
 
     # output
     seg = seg>0
@@ -106,9 +97,9 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     seg[seg>0]=255
 
     out_img_list.append(seg.copy())
-    out_name_list.append('bw_fine')
+    out_name_list.append('bw_coarse')
 
-    if output_type == 'default':
+    if output_type == 'default': 
         # the default final output
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'AICS_pipeline':
@@ -117,10 +108,11 @@ def Workflow_npm1(struct_img,rescale_ratio,output_type, output_path, fn, output_
     elif output_type == 'customize':
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
-    elif output_type == 'return':
-        return seg
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
-        img_list, name_list = NPM1_output(out_img_list, out_name_list, output_type, output_path, fn)
+        img_list, name_list = FBL_output(out_img_list, out_name_list, output_type, output_path, fn)
         if output_type == 'QCB':
             return img_list, name_list
+
+
+

@@ -8,8 +8,10 @@ import argparse
 import traceback
 import importlib
 import pathlib
+from glob import glob
 
 import aicsimageio
+import pdb
 
 
 ###############################################################################
@@ -103,14 +105,14 @@ class Args(object):
     def __parse(self):
         p = argparse.ArgumentParser()
         # Add arguments
-        p.add_argument('--d', '--debug', action='store_true', dest='debug',
+        p.add_argument('-d', '--debug', action='store_true', dest='debug',
                        help='If set debug log output is enabled')
         p.add_argument('--struct_name', dest='struct_name', default='skip',
                        help='Legacy Option for backward compatibility] use workflow_name instead')
         p.add_argument('--workflow_name', dest='workflow_name', default='template',
                        help='the name of your workflow')        
-        p.add_argument('--struct_ch', default=3, type=int, dest='struct_ch',
-                       help='the index of the structure channel of the image file, default is 3')
+        p.add_argument('--struct_ch', required=False, type=int, dest='struct_ch', default=1,
+                       help='the index of the structure channel of the image file, default is 1')
         p.add_argument('--xy', default=0.108, type=float, dest='xy',
                        help='the xy resolution of the image, default is 0.108')
         p.add_argument('--rescale', default=-1, type=float, dest='rescale',
@@ -119,8 +121,10 @@ class Args(object):
                        help='output directory')
         p.add_argument('--wrapper_dir', dest='wrapper_dir', default='_internal_',
                        help='wrapper directory')
-        p.add_argument('--use', dest='output_type', default='default', 
-                        help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
+        p.add_argument('--use', dest='output_type', default='default',
+                       help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
+        p.add_argument('--mitotic_stage', dest='mitotic_stage', default=None, 
+                       help='mitotic_stage')
 
         subparsers = p.add_subparsers(dest='mode')
         subparsers.required = True
@@ -203,24 +207,59 @@ class Executor(object):
 
             image_reader = aicsimageio.AICSImage(args.input_fname)
             img = image_reader.data
-            struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+            if len(img.shape) == 6:
+                struct_img = img[0,0,args.struct_ch, :, :, :].astype(np.float32)
+            else:
+                struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+            
+            # if args.mitotic_label == 'y':
+            #     mitosis_seg = (args.input_fname).replace("raw", "mito_seg")
+            #     mito_seg_reader = aicsimageio.AICSImage(mitosis_seg)
+            #     mitosis_seg_img = mito_seg_reader.data
 
-            SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fname)
+            #     mseg_img = mitosis_seg_img[0,0,:, 0, :, :].astype(np.float32)
+            #     struct_img =struct_img * mseg_img
+            
+            if args.mitotic_stage is None:
+                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fname)
+            else:
+                SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fname)
 
         elif args.mode == PER_DIR:
 
-            filenames = [os.path.basename(os.path.splitext(f)[0])
-                         for f in os.listdir(args.input_dir)
-                         if f.endswith(args.data_type)]
+            filenames = glob(args.input_dir + '/*' + args.data_type)
+            #[os.path.basename(os.path.splitext(f)[0])
+            #             for f in os.listdir(args.input_dir)
+            #             if f.endswith(args.data_type)]
             filenames.sort()
 
             for _, fn in enumerate(filenames):
 
-                image_reader = aicsimageio.AICSImage(os.path.join(args.input_dir, f'{fn}{args.data_type}'))
-                img = image_reader.data
-                struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+                if os.path.exists(str(output_path / (os.path.splitext(os.path.basename(fn))[0] + '_struct_segmentation.tiff'))):
+                    print(f'skipping {fn} ....')
+                    continue
 
-                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
+                image_reader = aicsimageio.AICSImage(fn)
+                img = image_reader.data
+                # import pdb; pdb.set_trace()
+
+                # fixing the image reading
+                if len(img.shape) == 6:
+                    # when z and c is not in order
+                    if img.shape[-3] < img.shape[-4]:
+                        img = np.transpose(img,(0,1,3,2,4,5))
+                    struct_img = img[0,0,args.struct_ch, :, :, :].astype(np.float32)
+                else:
+                    # when z and c is not in order
+                    if img.shape[-3] < img.shape[-4]:
+                        img = np.transpose(img,(0,2,1,3,4,))
+                    struct_img = img[0, args.struct_ch, :, :, :].astype(np.float32)
+
+                # Check if the segmenation is mitotic stage specific
+                if args.mitotic_stage is None:
+                    SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, os.path.splitext(os.path.basename(fn))[0])
+                else:
+                    SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fn)
 
 ###############################################################################
 
