@@ -177,14 +177,6 @@ class Executor(object):
             args.workflow_name = args.struct_name
         
         try:
-<<<<<<< HEAD
-            # if sys path not set yet use this code
-            sys.path.append("/allen/aics/assay-dev/users/Hyeonwoo/code/aics-segmentation/")
-            # pdb.set_trace()
-
-            module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
-            seg_module = importlib.import_module(module_name)
-=======
             if args.wrapper_dir == '_internal_':
                 module_name = 'aicssegmentation.structure_wrapper.seg_' + args.workflow_name
                 seg_module = importlib.import_module(module_name)   
@@ -197,7 +189,6 @@ class Executor(object):
                 except Exception as e: 
                     print('check errors in wrapper script')
                     print(str(e))
->>>>>>> 27f801a8a3228abadaf29bc8b6180e141799e276
             class_name = 'Workflow_'+ args.workflow_name
             SegModule = getattr(seg_module, class_name)
         except:
