@@ -111,8 +111,8 @@ class Args(object):
                        help='Legacy Option for backward compatibility] use workflow_name instead')
         p.add_argument('--workflow_name', dest='workflow_name', default='template',
                        help='the name of your workflow')        
-        p.add_argument('--struct_ch', required=False, type=int, dest='struct_ch', default=2,
-                       help='the index of the structure channel of the image file, default is 3')
+        p.add_argument('--struct_ch', required=False, type=int, dest='struct_ch', default=1,
+                       help='the index of the structure channel of the image file, default is 1')
         p.add_argument('--xy', default=0.108, type=float, dest='xy',
                        help='the xy resolution of the image, default is 0.108')
         p.add_argument('--rescale', default=-1, type=float, dest='rescale',
@@ -257,14 +257,9 @@ class Executor(object):
 
                 # Check if the segmenation is mitotic stage specific
                 if args.mitotic_stage is None:
-                    SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, fn)
+                    SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, os.path.splitext(os.path.basename(fn))[0])
                 else:
                     SegModule(struct_img, args.mitotic_stage, self.rescale_ratio, args.output_type, output_path, fn)
-
-<<<<<<< HEAD
-=======
-                SegModule(struct_img, self.rescale_ratio, args.output_type, output_path, os.path.splitext(os.path.basename(fn))[0])
->>>>>>> 27f801a8a3228abadaf29bc8b6180e141799e276
 
 ###############################################################################
 
