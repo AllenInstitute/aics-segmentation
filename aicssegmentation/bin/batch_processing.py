@@ -105,7 +105,7 @@ class Args(object):
     def __parse(self):
         p = argparse.ArgumentParser()
         # Add arguments
-        p.add_argument('--d', '--debug', action='store_true', dest='debug',
+        p.add_argument('-d', '--debug', action='store_true', dest='debug',
                        help='If set debug log output is enabled')
         p.add_argument('--struct_name', dest='struct_name', default='skip',
                        help='Legacy Option for backward compatibility] use workflow_name instead')
@@ -121,10 +121,10 @@ class Args(object):
                        help='output directory')
         p.add_argument('--wrapper_dir', dest='wrapper_dir', default='_internal_',
                        help='wrapper directory')
-        p.add_argument('--use', dest='output_type', default='default', 
-                        help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
+        p.add_argument('--use', dest='output_type', default='default',
+                       help='how to output the results, options are default, AICS_pipeline, AICS_QCB, AICS_RnD')
         p.add_argument('--mitotic_stage', dest='mitotic_stage', default=None, 
-                        help='mitotic_stage')
+                       help='mitotic_stage')
 
         subparsers = p.add_subparsers(dest='mode')
         subparsers.required = True
