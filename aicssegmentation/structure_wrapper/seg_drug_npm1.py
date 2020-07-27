@@ -105,7 +105,7 @@ def Workflow_drug_npm1(struct_img,rescale_ratio, output_type, output_path, fn, o
     elif output_type == 'customize':
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
-    elif output_type == 'return':
+    elif output_type == 'array':
         return seg
     else:
         # the hook for pre-defined RnD output functions (AICS internal)

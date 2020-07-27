@@ -70,6 +70,8 @@ def Workflow_cardio_actn2(struct_img,rescale_ratio, output_type, output_path, fn
     elif output_type == 'customize':
         # the hook for passing in a customized output function
         output_fun(out_img_list, out_name_list, output_path, fn)
+    elif output_type == 'array':
+        return seg
     else:
         # the hook for other pre-defined RnD output functions (AICS internal)
         ACTN2_Cardio_output(out_img_list, out_name_list, output_type, output_path, fn)
