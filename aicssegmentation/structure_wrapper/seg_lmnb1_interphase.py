@@ -9,7 +9,7 @@ from aicssegmentation.core.pre_processing_utils import intensity_normalization, 
 from aicssegmentation.core.utils import get_middle_frame, hole_filling, get_3dseed_from_mid_frame
 from skimage.morphology import remove_small_objects, watershed, dilation, ball
 from skimage.segmentation import find_boundaries
-from aicssegmentation.core.output_utils import save_segmentation
+from aicssegmentation.core.output_utils import save_segmentation, generate_segmentation_contour
 from aicsimageprocessing import resize
 
 def Workflow_lmnb1_interphase(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -79,6 +79,8 @@ def Workflow_lmnb1_interphase(struct_img,rescale_ratio, output_type, output_path
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         print('your can implement your output hook here, but not yet')
         quit()
