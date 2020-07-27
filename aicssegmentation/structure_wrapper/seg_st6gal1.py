@@ -6,7 +6,7 @@ from ..core.seg_dot import dot_3d
 from skimage.measure import label
 from skimage.filters import threshold_triangle, threshold_otsu
 from aicssegmentation.core.utils import topology_preserving_thinning
-from aicssegmentation.core.output_utils import save_segmentation, ST6GAL1_output
+from aicssegmentation.core.output_utils import save_segmentation, ST6GAL1_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 
 def Workflow_st6gal1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -103,6 +103,8 @@ def Workflow_st6gal1(struct_img,rescale_ratio, output_type, output_path, fn, out
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = ST6GAL1_output(out_img_list, out_name_list, output_type, output_path, fn)

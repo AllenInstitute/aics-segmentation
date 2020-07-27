@@ -5,7 +5,7 @@ from ..core.pre_processing_utils import intensity_normalization, image_smoothing
 from ..core.seg_dot import dot_slice_by_slice
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
-from aicssegmentation.core.output_utils import save_segmentation, FBL_output
+from aicssegmentation.core.output_utils import save_segmentation, FBL_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 from skimage.io import imsave
 
@@ -110,6 +110,8 @@ def Workflow_cardio_fbl(struct_img,rescale_ratio, output_type, output_path, fn, 
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = FBL_output(out_img_list, out_name_list, output_type, output_path, fn)
