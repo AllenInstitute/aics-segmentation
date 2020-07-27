@@ -53,7 +53,6 @@ setup(name=PACKAGE_NAME,
           ]
       },
       install_requires=[
-          'tifffile==0.15.1',
           'numpy>=1.15.1',
           'scipy>=1.1.0',
           'scikit-image==0.15.0',
