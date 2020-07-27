@@ -14,7 +14,7 @@ from aicsimageprocessing import resize
 from aicsimageio import AICSImage
 from skimage.io import imsave
 from argparse import ArgumentParser
-from aicssegmentation.core.output_utils import save_segmentation
+from aicssegmentation.core.output_utils import save_segmentation, generate_segmentation_contour
 
 
 def Workflow_son(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -76,6 +76,8 @@ def Workflow_son(struct_img, rescale_ratio, output_type, output_path, fn, output
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         print('your can implement your output hook here, but not yet')
         quit()

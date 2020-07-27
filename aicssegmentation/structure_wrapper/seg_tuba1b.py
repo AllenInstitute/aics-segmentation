@@ -3,7 +3,7 @@ import os
 from ..core.vessel  import vesselness3D
 from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
-from aicssegmentation.core.output_utils import save_segmentation, TUBA1B_output
+from aicssegmentation.core.output_utils import save_segmentation, TUBA1B_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 
 
@@ -75,6 +75,8 @@ def Workflow_tuba1b(struct_img,rescale_ratio, output_type, output_path, fn, outp
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = TUBA1B_output(out_img_list, out_name_list, output_type, output_path, fn)

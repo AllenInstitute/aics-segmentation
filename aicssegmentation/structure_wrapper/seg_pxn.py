@@ -3,7 +3,7 @@ import os
 from ..core.vessel  import vesselness3D
 from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from skimage.morphology import remove_small_objects
-from aicssegmentation.core.output_utils import save_segmentation, PXN_output
+from aicssegmentation.core.output_utils import save_segmentation, PXN_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 
 
@@ -101,6 +101,8 @@ def Workflow_pxn(struct_img,rescale_ratio, output_type, output_path, fn, output_
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = PXN_output(out_img_list, out_name_list, output_type, output_path, fn)

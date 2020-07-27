@@ -3,7 +3,7 @@ import os
 from skimage.morphology import remove_small_objects
 from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from ..core.vessel import vesselness3D
-from aicssegmentation.core.output_utils import save_segmentation, TTN_Cardio_output
+from aicssegmentation.core.output_utils import save_segmentation, TTN_Cardio_output, generate_segmentation_contour
 
 
 def Workflow_cardio_ttn(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -74,6 +74,8 @@ def Workflow_cardio_ttn(struct_img,rescale_ratio, output_type, output_path, fn, 
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for other pre-defined RnD output functions (AICS internal)
         TTN_Cardio_output(out_img_list, out_name_list, output_type, output_path, fn)

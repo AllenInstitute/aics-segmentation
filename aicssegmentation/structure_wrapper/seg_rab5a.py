@@ -6,7 +6,7 @@ from ..core.seg_dot import dot_3d
 from skimage.feature import peak_local_max
 from scipy.ndimage import distance_transform_edt
 from skimage.measure import label
-from aicssegmentation.core.output_utils import save_segmentation, RAB5A_output
+from aicssegmentation.core.output_utils import save_segmentation, RAB5A_output, generate_segmentation_contour
 from aicssegmentation.core.utils import hole_filling
 from aicsimageprocessing import resize
 
@@ -83,6 +83,8 @@ def Workflow_rab5a(struct_img,rescale_ratio, output_type, output_path, fn, outpu
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = RAB5A_output(out_img_list, out_name_list, output_type, output_path, fn)

@@ -4,7 +4,7 @@ from skimage.morphology import remove_small_objects
 from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice
 from ..core.seg_dot import dot_3d, dot_slice_by_slice
 from skimage.measure import label
-from aicssegmentation.core.output_utils import save_segmentation, GJA1_output
+from aicssegmentation.core.output_utils import save_segmentation, GJA1_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 
 def Workflow_gja1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -80,6 +80,8 @@ def Workflow_gja1(struct_img,rescale_ratio, output_type, output_path, fn, output
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = GJA1_output(out_img_list, out_name_list, output_type, output_path, fn)
