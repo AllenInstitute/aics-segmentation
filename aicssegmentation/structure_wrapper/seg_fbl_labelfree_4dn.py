@@ -72,6 +72,8 @@ def Workflow_fbl_labelfree_4dn(struct_img, rescale_ratio, output_type, output_pa
     if output_type == 'default': 
         # the default final output
         save_segmentation(seg, False, output_path, fn)
+    elif output_type == 'array':
+        return seg
     else:
         print('your can implement your output hook here, but not yet')
         quit()
