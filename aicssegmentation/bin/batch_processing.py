@@ -160,7 +160,7 @@ class Executor(object):
 
         standard_xy = 0.108
 
-        if args.rescale>0:
+        if args.rescale > 0:
             self.rescale_ratio = args.rescale
         else:
             if args.xy != standard_xy:

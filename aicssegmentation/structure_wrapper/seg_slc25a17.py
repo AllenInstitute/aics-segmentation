@@ -97,6 +97,8 @@ def Workflow_slc25a17(struct_img,rescale_ratio, output_type, output_path, fn, ou
         # the hook for passing in a customized output function
         #output_fun(out_img_list, out_name_list, output_path, fn)
         print('please provide custom output function')
+    elif output_type == 'array':
+        return seg
     else:
         # the hook for pre-defined RnD output functions (AICS internal)
         img_list, name_list = SLC25A17_output(out_img_list, out_name_list, output_type, output_path, fn)
