@@ -22,6 +22,10 @@ class SegmentationDispatchService:
             function_name = 'Workflow_'+ lower_gene
             logging.info(f'getting function '+function_name)
             SegModuleFunction = getattr(seg_module, function_name)
+        except Exception as e:
+            logging.error(f'raising failure while trying to get module/function for {module_name}')
+            raise e
+        try:
             logging.info('executing')
             (array_val, countour_val) = SegModuleFunction(struct_img=image,
                                                           rescale_ratio=rescale_ratio,
