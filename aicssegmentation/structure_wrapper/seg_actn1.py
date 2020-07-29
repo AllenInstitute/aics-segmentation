@@ -6,8 +6,11 @@ from ..core.vessel import vesselness3D
 from aicssegmentation.core.output_utils import save_segmentation, ACTN1_output, generate_segmentation_contour
 from aicsimageprocessing import resize
 
-
 def Workflow_atcn1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
+    # there was a typo, reproduced here to keep any code relying on the typo working
+    return Workflow_actn1(struct_img, rescale_ratio, output_type, output_path, fn, output_func)
+
+def Workflow_actn1(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
     # PARAMETERS:
     #   note that these parameters are supposed to be fixed for the structure
