@@ -2,10 +2,11 @@ import importlib
 import logging
 import numpy as np
 
+# Defaults cloned from existing ../bin/batch_processing script
 DEFAULT_MODULE_PATH = 'aicssegmentation.structure_wrapper.seg_'
 DEFAULT_RESCALE_RATIO = -1
 
-class SegmentationDispatchService:
+class StructureSegmenter:
 
     def __init__(self):
         self.log = logging.getLogger(__name__)
