@@ -2,6 +2,7 @@ import numpy as np
 import os
 from ..core.pre_processing_utils import intensity_normalization, edge_preserving_smoothing_3d
 from ..core.seg_dot import dot_2d_slice_by_slice_wrapper
+from skimage.morphology import remove_small_objects
 from aicssegmentation.core.output_utils import save_segmentation, generate_segmentation_contour
 from aicsimageprocessing import resize
 
