@@ -1,7 +1,7 @@
 import numpy as np
 
 # package for io 
-from aicsimageio import AICSImage, omeTifWriter                            
+from aicsimageio import AICSImage
 
 # function for core algorithm
 from aicssegmentation.core.vessel import filament_2d_wrapper
