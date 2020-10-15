@@ -31,6 +31,8 @@ After following the installation instructions above, users will find that the cl
 1. formulated as a simple 3-step workflow for solving 3D intracellular structure segmentation problem using restricted number of selectable algorithms and tunable parameters
 2. accompanied by a ["lookup table"](./docs/toolkit_paper_lookup_table_20181206.pdf) with 20 representative structure localization patterns and their results as a reference, as well as the Jupyter notebook for these workflows as a starting point. The [pseudocode of all 20 workflows](./docs/toolkit_paper_SI_vFinalForBioRxiv.pdf) are also provided.
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AllenInstitute/aics-segmentation/lookup_table_demo]
+
 Typically, we use Jupyter notebook as a "playground" to explore different algorithms and adjust the parameters. After determining the algorithms and parameters, we use Python scritps to do batch processing/validation on a large number of data. 
 
 **You can find a [DEMO on a real example](https://github.com/AllenInstitute/aics-ml-segmentation/blob/master/docs/demo_1.md) on our tutorial page**
