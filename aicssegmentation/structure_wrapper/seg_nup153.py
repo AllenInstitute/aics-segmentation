@@ -4,7 +4,7 @@ from skimage.morphology import remove_small_objects
 from ..core.pre_processing_utils import intensity_normalization, image_smoothing_gaussian_slice_by_slice, edge_preserving_smoothing_3d
 from ..core.seg_dot import dot_3d_wrapper,  dot_2d_slice_by_slice_wrapper
 from skimage.measure import label
-from aicssegmentation.core.output_utils import save_segmentation#, NUP153_output
+from aicssegmentation.core.output_utils import save_segmentation, generate_segmentation_contour#, NUP153_output
 from aicsimageprocessing import resize
 
 def Workflow_nup153(struct_img,rescale_ratio, output_type, output_path, fn, output_func=None):
@@ -80,6 +80,8 @@ def Workflow_nup153(struct_img,rescale_ratio, output_type, output_path, fn, outp
         output_fun(out_img_list, out_name_list, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         pass 
         # the hook for pre-defined RnD output functions (AICS internal)

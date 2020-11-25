@@ -2,18 +2,17 @@ import os
 
 import numpy as np
 from skimage.morphology import erosion, ball
-import aicsimageio
+from aicsimageio.writers import OmeTiffWriter
 
 def save_segmentation(bw, contour_flag, output_path, fn):
-
-    writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_segmentation.tiff')))
-    writer.save(bw)
+    with OmeTiffWriter(str(output_path / (fn + '_struct_segmentation.tiff'))) as writer:
+        writer.save(bw)
 
     if contour_flag:
         bd = generate_segmentation_contour(bw)
 
-        writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_struct_contour.tiff')))
-        writer.save(bd)
+        with OmeTiffWriter(str(output_path / (fn + '_struct_contour.tiff'))) as writer:
+            writer.save(bd)
 
 
 def generate_segmentation_contour(im):
@@ -35,11 +34,11 @@ def output_hook(im, names, out_flag, output_path, fn):
                 segmentation_type = names[i]
                 bw = im[i].astype(np.uint8)
                 bw[bw>0]=255
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_bw_' + segmentation_type[3:] + '.tiff')))
-                writer.save(bw)
+                with OmeTiffWriter(str(output_path / (fn + '_bw_' + segmentation_type[3:] + '.tiff'))) as writer:
+                    writer.save(bw)
             else:
-                writer = aicsimageio.omeTifWriter.OmeTifWriter(str(output_path / (fn + '_' + names[i] + '.tiff')))
-                writer.save(im[i])
+                with OmeTiffWriter(str(output_path / (fn + '_' + names[i] + '.tiff'))) as writer:
+                    writer.save(im[i])
 
 
 def paperFigure(out_img_list, out_name_list, output_type, output_path, fn):

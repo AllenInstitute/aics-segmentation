@@ -9,7 +9,7 @@ from skimage.measure import label
 from aicsimageprocessing import resize
 
 #### do not remove ####
-from aicssegmentation.core.output_utils import  save_segmentation
+from aicssegmentation.core.output_utils import  save_segmentation, generate_segmentation_contour
 
 def Workflow_npm_labelfree_4dn(struct_img, rescale_ratio, output_type, output_path, fn, output_func=None):
     ##########################################################################
@@ -74,6 +74,8 @@ def Workflow_npm_labelfree_4dn(struct_img, rescale_ratio, output_type, output_pa
         save_segmentation(seg, False, output_path, fn)
     elif output_type == 'array':
         return seg
+    elif output_type == 'array_with_contour':
+        return (seg, generate_segmentation_contour(seg))
     else:
         print('your can implement your output hook here, but not yet')
         quit()
