@@ -76,7 +76,7 @@ e.g., one module depends on another and you editing both. In that scenario you w
 and do source install into it from all the relevant module repos.
 
 Assuming we have project A and B with modules `mod_a` and `mod_b`, where `mod_b` depends on `mod_a`. 
-We want to work on both together. Let's use the virtual environment created by gradle for B. To setup the enviroment 
+We want to work on both together. Let's use the virtual environment created by gradle for B. To setup the environment 
 for development on both A and B, I do the following.
 ```
 # We are in B's workspace. First setup the virtual environment
